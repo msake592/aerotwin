@@ -34,19 +34,19 @@ Gazebo is intended to supply simulation and ground truth; PX4 SITL will provide 
 | Integration | ROS 2, Gazebo, PX4 SITL |
 | Experiments and analysis | Python |
 | Tests | GoogleTest, CTest, and pytest (implemented) |
-| Automation | GitHub Actions (implemented, awaiting hosted verification) |
+| Automation | GitHub Actions (implemented and verified) |
 
 CMake 3.20+ and a C++20 compiler are required for the current build. Robotics dependency versions and installation are deferred to later foundation work. The primary machine is an Apple Silicon MacBook without an NVIDIA CUDA GPU; core development must remain usable without NVIDIA-specific hardware.
 
 ## Current development status
 
-M0 — Project Foundation is **In Progress**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds GitHub Actions CI and is **Implemented — Awaiting CI Verification**. Simulation, EKF, navigation, and ROS 2 packages remain planned.
+M0 — Project Foundation is **Complete (locally verified; pending PR review/merge)**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the [architecture review and M1 readiness](docs/architecture/m0-review.md). Simulation, EKF, navigation, and ROS 2 packages remain planned.
 
 ## Development roadmap
 
 | Milestone | Focus | Status |
 | --- | --- | --- |
-| M0 | Project Foundation | In Progress |
+| M0 | Project Foundation | Complete (locally verified; pending PR review/merge) |
 | M1 | Mathematical & Simulation Foundations | Not Started |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
@@ -105,7 +105,7 @@ cmake -S . -B build/native-debug -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/native-debug --config Debug
 ```
 
-`CMAKE_BUILD_TYPE` selects the configuration for single-configuration generators. For multi-configuration generators such as Visual Studio, `--config Debug` selects it at build time; run `build/native-debug/examples/basic_core/Debug/aerotwin_basic_core.exe`. Use a separate directory and `Release` in place of `Debug` for an equivalent Release build. Non-macOS platforms have not yet been verified.
+`CMAKE_BUILD_TYPE` selects the configuration for single-configuration generators. For multi-configuration generators such as Visual Studio, `--config Debug` selects it at build time; run `build/native-debug/examples/basic_core/Debug/aerotwin_basic_core.exe`. Use a separate directory and `Release` in place of `Debug` for an equivalent Release build. The hosted Debug matrix also passed on Ubuntu 24.04.
 
 There are no installation or simulation launch commands yet.
 
@@ -173,13 +173,13 @@ pytest and Ruff configuration lives in `pyproject.toml`: tests are under `tests/
 
 The [CI workflow](.github/workflows/ci.yml) runs for pull requests targeting `main` and pushes to `main`. It builds and tests C++ Debug on Ubuntu 24.04 and macOS 15, and runs the Python editable install, pytest, and Ruff lint and format checks on Ubuntu 24.04 with Python 3.11 and 3.13.
 
-Follow the [local CI commands and failure triage guide](CONTRIBUTING.md#continuous-integration) to reproduce the checks. Local verification exercises the commands on the available toolchains. Hosted verification requires a GitHub Actions run with all four matrix jobs passing.
+Follow the [local CI commands and failure triage guide](CONTRIBUTING.md#continuous-integration) to reproduce the checks. Local verification exercises the commands on the available toolchains. All four matrix jobs passed in the hosted Step 0.7 run. [GitHub Actions run](https://github.com/msake592/aerotwin/actions/runs/41910316075)
 
 ## Testing status
 
-Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Step 0.7 also verified a fresh editable install, all three pytest cases, and both Ruff checks on Apple Silicon macOS with Python 3.13.1. The hosted Ubuntu jobs and Python 3.11 remain unverified.
+Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Step 0.7 also verified a fresh editable install, all three pytest cases, and both Ruff checks on Apple Silicon macOS with Python 3.13.1. The hosted Ubuntu jobs passed for Python 3.11 and 3.13.
 
-The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. Other platforms and CMake 3.20 remain untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
+The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 
 ## License
 

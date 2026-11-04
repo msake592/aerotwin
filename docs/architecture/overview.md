@@ -11,3 +11,5 @@ Python tools will configure and orchestrate reproducible experiments, collect ar
 Core development targets the Apple Silicon development machine and must not require CUDA or NVIDIA hardware. Integration compatibility and versions remain to be validated in a later milestone.
 
 See [module boundaries](module-boundaries.md), [data flow](data-flow.md), [coordinate frames](coordinate-frames.md), and [ADR 0001](../adr/0001-core-independent-of-ros.md).
+
+See the [M0 architecture review](m0-review.md) and [robotics integration feasibility assessment](robotics-integration-feasibility.md). The [Python experiment decision](../adr/0002-python-experiments.md), [frame decision](../adr/0003-coordinate-frames.md), and [simulation-time decision](../adr/0004-simulation-time.md) capture the design contracts for later milestones.

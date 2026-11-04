@@ -1,6 +1,6 @@
 # Intended module boundaries
 
-Status: planned responsibilities, with only the Step 0.4 version-reporting utility implemented in `core/common` and linked by a basic example. Algorithm and integration modules remain unimplemented.
+Status: planned responsibilities, with a version-reporting C++ library, a Python package scaffold, and their unit tests implemented. Algorithm and integration modules remain unimplemented.
 
 | Location | Responsibility | Boundary |
 | --- | --- | --- |

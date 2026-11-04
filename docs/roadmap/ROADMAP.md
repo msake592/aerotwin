@@ -1,10 +1,10 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds CI and awaits hosted verification. Simulation, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. Simulation, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
-**Status:** In Progress
+**Status:** Complete (locally verified; pending PR review/merge)
 
 **Objective:** Establish a documented and reviewable engineering foundation.
 
@@ -60,19 +60,28 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ### Step 0.7 — GitHub Actions Continuous Integration
 
-**Status:** Implemented — Awaiting CI Verification
+**Status:** Complete
 
 - [x] Configure CI for pull requests targeting `main` and pushes to `main`.
 - [x] Configure C++ Debug and CTest on Ubuntu 24.04 and macOS 15 using the existing presets and GoogleTest FetchContent setup.
 - [x] Configure editable installation, pytest, Ruff lint, and Ruff format checks on Ubuntu 24.04 with Python 3.11 and 3.13.
 - [x] Document [local reproduction and failure triage](../../CONTRIBUTING.md#continuous-integration).
-- [ ] Push the workflow to GitHub and record a successful hosted run covering all four matrix jobs.
+- [x] Record a successful hosted run covering all four matrix jobs.
 
-**Local verification:** YAML parsed successfully. On Apple Silicon macOS, the Debug preset built and CTest passed 3/3 cases. A fresh Python 3.13.1 virtual environment passed editable installation, 3/3 pytest cases, Ruff lint, and Ruff format checks. `actionlint` was unavailable. These results cover the local environment. Hosted runner setup and matrix results are pending.
+**Local verification:** YAML parsed successfully. On Apple Silicon macOS, the Debug preset built and CTest passed 3/3 cases. A fresh Python 3.13.1 virtual environment passed editable installation, 3/3 pytest cases, Ruff lint, and Ruff format checks. `actionlint` was unavailable. These results cover the local environment.
 
-### Remaining M0 work
+**Hosted verification:** The GitHub Actions API reported success for C++ Debug on Ubuntu 24.04 and macOS 15 and for Python 3.11 and 3.13 on Ubuntu 24.04. The run corresponds to workflow commit `12ecc89`, merged as `2691531`. [CI run](https://github.com/msake592/aerotwin/actions/runs/41910316075), [PR #1](https://github.com/msake592/aerotwin/pull/1)
 
-- [ ] Complete any remaining environment/setup validation before closing M0.
+### Step 0.8 — Architecture Review & M0 Readiness
+
+**Status:** Complete (locally verified; pending PR review/merge)
+
+- [x] Document the [architecture review and M1 readiness](../architecture/m0-review.md).
+- [x] Record standalone core, deferred middleware, Python, frames, and simulation-time decisions.
+- [x] Audit local build and test paths and record hosted CI evidence separately.
+- [x] Document [Apple Silicon robotics feasibility](../architecture/robotics-integration-feasibility.md).
+
+**Local audit:** Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4. Debug and Release configured and built, both examples ran, and CTest passed 3/3 cases for each preset. A fresh `BUILD_TESTING=OFF` build ran the example and produced zero registered tests and no FetchContent dependency directory. A fresh Python 3.13.1 virtual environment passed editable installation, pytest (3/3), Ruff lint, and Ruff formatting. Workflow YAML parsed and its triggers, job matrix, and test commands were reviewed. Representative generated paths matched `.gitignore`. `actionlint` was unavailable.
 
 ## M1 — Mathematical & Simulation Foundations
 
