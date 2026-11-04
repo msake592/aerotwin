@@ -18,6 +18,25 @@ The standalone C++20 library and example can be built in Debug and Release using
 
 For build-system changes, also verify `cmake -S . -B build/no-tests -DBUILD_TESTING=OFF`, `cmake --build build/no-tests`, and the example in that directory. This configuration must not fetch or configure GoogleTest. Keep integration tests deferred until they exercise meaningful integration behavior. Documentation changes should verify file existence, relative links, and consistency with implemented status. CI configuration remains deferred. Platform verification and results are recorded in the [roadmap](docs/roadmap/ROADMAP.md); report limitations for environments you cannot exercise.
 
+## Python development
+
+Use Python 3.11+ and a project-local `.venv`; follow the [README setup](README.md#python-development-environment). Activate the environment and install `python -m pip install -e ".[dev]"`. Do not install packages globally or modify `PYTHONPATH` to make tests pass.
+
+Keep Python sources in `experiments/python/src/aerotwin_experiments/` and tests in `tests/python/`. setuptools provides the pure-Python build backend; pytest and Ruff are development-only dependencies. Keep runtime dependencies minimal and justify additions. The editable-installation test intentionally requires the documented editable development installation.
+
+Before submitting Python changes, run:
+
+```sh
+python -m pytest
+ruff check .
+ruff format --check .
+cmake --preset dev-debug
+cmake --build --preset dev-debug
+ctest --preset dev-debug
+```
+
+pytest uses importlib mode and the installed package; test paths and Ruff rules are configured in `pyproject.toml`. Ruff checks basic errors and import ordering with a 100-character formatter setting and Python 3.11 target. Python is reserved for experiment orchestration and analysis; numerical/autonomy core implementations remain in C++. Do not introduce bindings, robotics frameworks, scientific libraries, or future experiment functionality without a scoped task. Record the interpreter, dependency versions, platform, and checks actually run; Linux compatibility is intended but not yet verified.
+
 ## Documentation and design
 
 Update README and roadmap status when behavior changes. Record major architectural decisions as numbered ADRs. Document frames, units, timestamps, sensor assumptions, and non-obvious choices. Keep the core independent of ROS 2 and avoid dependencies outside the requested milestone.

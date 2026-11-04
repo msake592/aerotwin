@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aerotwin-experiments"
+version = "0.1.0.dev0"
+description = "Python experiment tooling foundation for AeroTwin"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "AeroTwin Contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.11,<1"]
+
+[tool.setuptools.packages.find]
+where = ["experiments/python/src"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests/python"]
+addopts = ["--import-mode=importlib", "-ra"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["build", "outputs", "ros2_ws/build", "ros2_ws/install", "ros2_ws/log"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

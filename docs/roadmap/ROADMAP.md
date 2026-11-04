@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.5 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, and optional GoogleTest/CTest unit testing. Simulation, estimation, autonomy, and CI remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Simulation, estimation, autonomy, and CI remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -8,9 +8,9 @@ Steps 0.1–0.5 are implemented: repository foundation documentation, a minimal 
 
 **Objective:** Establish a documented and reviewable engineering foundation.
 
-**Main tasks:** Create the repository structure and initial documentation; establish engineering guidance and an ADR; establish the standalone C++20 build; establish optional unit testing; scope later CI tasks.
+**Main tasks:** Create the repository structure and initial documentation; establish engineering guidance and an ADR; establish the standalone C++20 build; establish optional C++ unit testing and the Python development environment; scope later CI tasks.
 
-**Deliverables:** Repository skeleton, README, contribution guidance, architecture documents, roadmap, license, formatting and ignore rules, CMake targets and presets, a linked version-reporting example, and discovered GoogleTest unit tests.
+**Deliverables:** Repository skeleton, README, contribution guidance, architecture documents, roadmap, license, formatting and ignore rules, CMake targets and presets, a linked version-reporting example, discovered GoogleTest unit tests, and an editable Python experiment package with pytest and Ruff configuration.
 
 **Definition of done:** Initial files and links are verified, and remaining foundation setup/build/test/CI work is explicitly scoped and validated before M0 closes.
 
@@ -44,7 +44,22 @@ Steps 0.1–0.5 are implemented: repository foundation documentation, a minimal 
 
 **Verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4, Unix Makefiles. Ran `cmake --preset dev-debug`, `cmake --build --preset dev-debug`, `ctest --preset dev-debug`, and equivalent Release commands. Ran `cmake -S . -B build/no-tests -DBUILD_TESTING=OFF` and `cmake --build build/no-tests`. All three configurations' examples printed `AeroTwin version: 0.1.0-dev` and exited with status 0. The initial sandboxed dependency fetch failed DNS resolution; retrying with approved network access succeeded. Other platforms and CMake 3.20 have not been exercised. Integration tests remain intentionally deferred.
 
+### Step 0.6 — Python Development Environment & pytest
+
+- [x] Root `pyproject.toml` declares Python 3.11+, a lightweight setuptools backend, no runtime dependencies, and a pytest/Ruff development extra.
+- [x] Preserve existing experiment directories and place Python sources under `experiments/python/src/aerotwin_experiments/`.
+- [x] Add only a standard-library package identity function; no duplicate C++ version function, algorithms, bindings, or robotics dependencies.
+- [x] Create local `.venv/`, upgrade pip, and install the package in editable mode with development dependencies.
+- [x] Verify imports, expected identity, and editable source/metadata with three passing pytest cases.
+- [x] Verify pytest from the repository root and a different working directory inside the repository, without `PYTHONPATH` changes.
+- [x] Pass Ruff linting and formatting checks with Python 3.11 target syntax and 100-character formatting.
+- [x] Reconfigure/build C++ Debug and pass all three existing CTest cases without C++ changes.
+- [x] Verify generated environment, metadata, caches, and build artifacts remain ignored and document setup and responsibilities.
+
+**Verification:** Apple Silicon macOS; Python 3.14.5, pip 26.3, pytest 9.2.0, Ruff 0.17.3. Created `.venv/` using `python3 -m venv .venv`, upgraded pip, and ran `python -m pip install -e ".[dev]"` using the environment's interpreter. `python -m pytest` passed 3/3 cases; the same suite also passed from `build/no-tests/` using its absolute path. `ruff check .` and `ruff format --check .` passed. An isolated `python -I` import returned `aerotwin_experiments`, and `pip check` found no broken requirements. `cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and `ctest --preset dev-debug` passed (3/3 C++ tests). The initial sandboxed pip attempt failed DNS resolution; retrying with approved network access succeeded. No packages were installed globally. Linux and other supported Python versions remain unverified; dependency ranges are not an exact lock.
+
 ### Remaining M0 work
+
 - [ ] Configure and validate CI in a subsequent step.
 - [ ] Complete any remaining environment/setup validation before closing M0.
 
