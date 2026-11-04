@@ -13,4 +13,4 @@ Status: conceptual flow; no connections or runtime behavior exist yet.
 
 Each future contract must declare frame, units, clock domain, validity, and relevant covariance semantics. Timestamp ordering, missing observations, reset behavior, and synchronization policy must be specified before implementing fusion. Wall-clock performance measurements must be distinguished from simulated elapsed time.
 
-See [coordinate frames](coordinate-frames.md) for convention requirements.
+See [coordinate frames](coordinate-frames.md) and [simulation time](../adr/0004-simulation-time.md) for convention requirements.
