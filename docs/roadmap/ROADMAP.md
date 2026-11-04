@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Simulation, estimation, autonomy, and CI remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds CI and awaits hosted verification. Simulation, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -8,9 +8,9 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 **Objective:** Establish a documented and reviewable engineering foundation.
 
-**Main tasks:** Create the repository structure and initial documentation; establish engineering guidance and an ADR; establish the standalone C++20 build; establish optional C++ unit testing and the Python development environment; scope later CI tasks.
+**Main tasks:** Create the repository structure and initial documentation; establish engineering guidance and an ADR; establish the standalone C++20 build; establish optional C++ unit testing and the Python development environment; configure and verify CI.
 
-**Deliverables:** Repository skeleton, README, contribution guidance, architecture documents, roadmap, license, formatting and ignore rules, CMake targets and presets, a linked version-reporting example, discovered GoogleTest unit tests, and an editable Python experiment package with pytest and Ruff configuration.
+**Deliverables:** Repository skeleton, README, contribution guidance, architecture documents, roadmap, license, formatting and ignore rules, CMake targets and presets, a linked version-reporting example, discovered GoogleTest unit tests, and an editable Python experiment package with pytest and Ruff configuration, plus a GitHub Actions CI workflow.
 
 **Definition of done:** Initial files and links are verified, and remaining foundation setup/build/test/CI work is explicitly scoped and validated before M0 closes.
 
@@ -58,9 +58,20 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 **Verification:** Apple Silicon macOS; Python 3.14.5, pip 26.3, pytest 9.2.0, Ruff 0.17.3. Created `.venv/` using `python3 -m venv .venv`, upgraded pip, and ran `python -m pip install -e ".[dev]"` using the environment's interpreter. `python -m pytest` passed 3/3 cases; the same suite also passed from `build/no-tests/` using its absolute path. `ruff check .` and `ruff format --check .` passed. An isolated `python -I` import returned `aerotwin_experiments`, and `pip check` found no broken requirements. `cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and `ctest --preset dev-debug` passed (3/3 C++ tests). The initial sandboxed pip attempt failed DNS resolution; retrying with approved network access succeeded. No packages were installed globally. Linux and other supported Python versions remain unverified; dependency ranges are not an exact lock.
 
+### Step 0.7 — GitHub Actions Continuous Integration
+
+**Status:** Implemented — Awaiting CI Verification
+
+- [x] Configure CI for pull requests targeting `main` and pushes to `main`.
+- [x] Configure C++ Debug and CTest on Ubuntu 24.04 and macOS 15 using the existing presets and GoogleTest FetchContent setup.
+- [x] Configure editable installation, pytest, Ruff lint, and Ruff format checks on Ubuntu 24.04 with Python 3.11 and 3.13.
+- [x] Document [local reproduction and failure triage](../../CONTRIBUTING.md#continuous-integration).
+- [ ] Push the workflow to GitHub and record a successful hosted run covering all four matrix jobs.
+
+**Local verification:** YAML parsed successfully. On Apple Silicon macOS, the Debug preset built and CTest passed 3/3 cases. A fresh Python 3.13.1 virtual environment passed editable installation, 3/3 pytest cases, Ruff lint, and Ruff format checks. `actionlint` was unavailable. These results cover the local environment. Hosted runner setup and matrix results are pending.
+
 ### Remaining M0 work
 
-- [ ] Configure and validate CI in a subsequent step.
 - [ ] Complete any remaining environment/setup validation before closing M0.
 
 ## M1 — Mathematical & Simulation Foundations

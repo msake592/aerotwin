@@ -34,13 +34,13 @@ Gazebo is intended to supply simulation and ground truth; PX4 SITL will provide 
 | Integration | ROS 2, Gazebo, PX4 SITL |
 | Experiments and analysis | Python |
 | Tests | GoogleTest, CTest, and pytest (implemented) |
-| Automation | GitHub Actions |
+| Automation | GitHub Actions (implemented, awaiting hosted verification) |
 
 CMake 3.20+ and a C++20 compiler are required for the current build. Robotics dependency versions and installation are deferred to later foundation work. The primary machine is an Apple Silicon MacBook without an NVIDIA CUDA GPU; core development must remain usable without NVIDIA-specific hardware.
 
 ## Current development status
 
-M0 — Project Foundation is **In Progress**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Simulation, EKF, navigation, ROS 2 packages, and CI remain unimplemented.
+M0 — Project Foundation is **In Progress**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds GitHub Actions CI and is **Implemented — Awaiting CI Verification**. Simulation, EKF, navigation, and ROS 2 packages remain planned.
 
 ## Development roadmap
 
@@ -167,13 +167,19 @@ python -I -c "from aerotwin_experiments import package_name; print(package_name(
 
 pytest and Ruff configuration lives in `pyproject.toml`: tests are under `tests/python/`; Ruff uses Python 3.11 syntax, a 100-character line length, basic error checks, import sorting, and its formatter. Ruff excludes generated build and output trees. Use `ruff format .` to apply formatting. No Python commands are coupled to the CMake build.
 
-`.venv/`, caches, generated package metadata, and build artifacts are ignored. Inspect an existing environment before reusing it; do not delete it automatically. Dependencies install only in the virtual environment, with network access needed for initial setup. Development dependency ranges allow compatible updates; this step does not provide an exact dependency lock or claim bit-for-bit environment reproduction. Linux and Python versions other than the locally verified interpreter remain untested.
+`.venv/`, caches, generated package metadata, and build artifacts are ignored. Inspect an existing environment before reusing it; do not delete it automatically. Dependencies install only in the virtual environment, with network access needed for initial setup. Development dependency ranges allow compatible updates; this step does not provide an exact dependency lock or claim bit-for-bit environment reproduction. The CI matrix targets Linux with Python 3.11 and 3.13.
+
+## Continuous integration
+
+The [CI workflow](.github/workflows/ci.yml) runs for pull requests targeting `main` and pushes to `main`. It builds and tests C++ Debug on Ubuntu 24.04 and macOS 15, and runs the Python editable install, pytest, and Ruff lint and format checks on Ubuntu 24.04 with Python 3.11 and 3.13.
+
+Follow the [local CI commands and failure triage guide](CONTRIBUTING.md#continuous-integration) to reproduce the checks. Local verification exercises the commands on the available toolchains. Hosted verification requires a GitHub Actions run with all four matrix jobs passing.
 
 ## Testing status
 
-Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Python 3.11–3.13 and Linux have not been exercised.
+Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Step 0.7 also verified a fresh editable install, all three pytest cases, and both Ruff checks on Apple Silicon macOS with Python 3.13.1. The hosted Ubuntu jobs and Python 3.11 remain unverified.
 
-The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. Other platforms and CMake 3.20 remain untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists; CI is a subsequent step. Future functionality must include relevant tests; no performance or reliability results are claimed.
+The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. Other platforms and CMake 3.20 remain untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 
 ## License
 
