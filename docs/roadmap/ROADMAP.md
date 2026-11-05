@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.2 DONE; M1.3 not started)
+**Status:** In Progress (M1.2 DONE; M1.3 pending review)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -129,7 +129,7 @@ were not tested for this change; hosted CI remains pending.
 - Finite-vector and unit-quaternion validation without implicit repair.
 - [Unit/frame/point contracts and transformation API draft](../architecture/math-contracts.md).
 - [ADR 0006](../adr/0006-math-type-contracts.md) records aliases versus wrappers and invariant ownership.
-- Quaternion operations (M1.3), frame transformations (M1.4), clocks, and simulation remain unimplemented.
+- At M1.2 completion, quaternion operations (M1.3), frame transformations (M1.4), clocks, and simulation were deferred.
 
 **Local verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4.
 `cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and
@@ -145,7 +145,44 @@ Ruff 0.17.3: `.venv/bin/ruff check .` and `.venv/bin/ruff format --check .`
 passed; `pip check` and `git diff --check` passed. No existing tests were removed.
 Other platforms, Python 3.11/3.13, minimum CMake, and hosted M1.2 CI were not run locally.
 
-**Hosted verification:** All four jobs passed in [CI run 42091533319](https://github.com/msake592/aerotwin/actions/runs/42091533319): C++ Debug/CTest on Ubuntu 24.04 and macOS 15, and Python tests plus Ruff checks on Ubuntu 24.04 with Python 3.11 and 3.13. M1.3 may begin as a separately scoped task; no M1.3 implementation has started.
+**Hosted verification:** All four jobs passed in [CI run 42091533319](https://github.com/msake592/aerotwin/actions/runs/42091533319): C++ Debug/CTest on Ubuntu 24.04 and macOS 15, and Python tests plus Ruff checks on Ubuntu 24.04 with Python 3.11 and 3.13. This closed the M1.2 prerequisite for M1.3.
+
+### Step M1.3 — Quaternion & Rotation Mathematics
+
+**Status:** Implemented and locally verified; pending review, merge, and hosted CI. Not DONE.
+
+Four checked operations normalize, compose (`after * before`), invert, and rotate
+vectors using existing Eigen aliases and Hamilton conventions. `std::optional`
+reports invalid input/nonfinite output. Rotation inputs must satisfy the existing
+`1e-12` norm tolerance; accepted rounding drift is removed explicitly by policy.
+See [rotation contracts](../architecture/quaternion-rotations.md) and
+[ADR 0007](../adr/0007-quaternion-rotations.md). Full transformations, state models,
+clocks, dynamics, and middleware remain deferred. PR #5 was verified merged with
+all four CI jobs successful before implementation began.
+
+**Local verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4.
+`cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and
+`ctest --preset dev-debug` passed; equivalent Release commands passed. Each suite
+passed 35/35 cases, preserving all 14 existing cases and adding 21 rotation cases.
+Coverage includes identity, WXYZ normalization, inverse, noncommuting composition,
+Z-axis quarter turns, inverse round trips, norm preservation, sign equivalence,
+invalid inputs, default tolerance boundaries, extreme finite normalization, and
+vector output overflow. Eight additional numerical regressions cover identity and
+known rotations with mixed-magnitude/subnormal vector components, overflow before
+cancellation, mixed-magnitude quaternion normalization, accepted drift on a
+non-identity rotation, and 10,000 repeated compositions. Three component-loss
+regressions failed against the original unconditional scaling implementation,
+then passed with unscaled finite rows and overflow-only row retries.
+An additional 10,000-step composition test uses 0.1-radian increments and checks
+finite/unit quaternions and the analytically accumulated rotation modulo 2*pi
+with an absolute component tolerance of `1e-11`.
+The existing `build/m1-no-tests` configuration rebuilt
+with `BUILD_TESTING=OFF`; its example and both preset examples passed.
+Python 3.14.5 / pytest 9.2.0: 3/3 passed after restoring the missing editable
+package via `.venv/bin/python -m pip install -e '.[dev]'` with approved network
+access. Ruff 0.17.3 lint and format checks, `pip check`, and `git diff --check`
+passed. Changed documentation's relative file links were checked. Hosted M1.3 CI,
+other platforms, Python 3.11/3.13, and minimum CMake 3.20 were not exercised.
 
 ## M2 — Sensor Simulation & State Estimation
 
