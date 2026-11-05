@@ -1,6 +1,6 @@
 # ADR 0006: Use Eigen aliases with explicit mathematical contracts
 
-Status: Proposed (M1.2 implemented; pending review)
+Status: Accepted (M1.2 merged through [PR #4](https://github.com/msake592/aerotwin/pull/4); all four CI jobs passed)
 
 ## Context
 
