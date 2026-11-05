@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.2 pending review)
+**Status:** In Progress (M1.2 DONE; M1.3 not started)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -123,7 +123,7 @@ were not tested for this change; hosted CI remains pending.
 
 ### Step M1.2 — Mathematical Types & Unit Contracts
 
-**Status:** Implemented and locally verified; pending PR merge and successful hosted CI. Not DONE.
+**Status:** DONE. [PR #4](https://github.com/msake592/aerotwin/pull/4) merged into `main` at `1f2986b`; implementation commit `d0df059` is included.
 
 - Eigen double-precision `Vector3` and Hamilton `Quaternion` aliases with explicit initialization requirements.
 - Finite-vector and unit-quaternion validation without implicit repair.
@@ -143,7 +143,9 @@ An initial no-build-isolation repair could not import missing setuptools; the
 standard isolated installation succeeded with approved network access.
 Ruff 0.17.3: `.venv/bin/ruff check .` and `.venv/bin/ruff format --check .`
 passed; `pip check` and `git diff --check` passed. No existing tests were removed.
-Other platforms, Python 3.11/3.13, minimum CMake, and hosted M1.2 CI were not run.
+Other platforms, Python 3.11/3.13, minimum CMake, and hosted M1.2 CI were not run locally.
+
+**Hosted verification:** All four jobs passed in [CI run 42091533319](https://github.com/msake592/aerotwin/actions/runs/42091533319): C++ Debug/CTest on Ubuntu 24.04 and macOS 15, and Python tests plus Ruff checks on Ubuntu 24.04 with Python 3.11 and 3.13. M1.3 may begin as a separately scoped task; no M1.3 implementation has started.
 
 ## M2 — Sensor Simulation & State Estimation
 
