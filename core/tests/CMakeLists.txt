@@ -21,6 +21,7 @@ add_executable(aerotwin_core_tests
     unit/VersionTest.cpp
     unit/EigenTest.cpp
     unit/MathTypesTest.cpp
+    unit/RotationsTest.cpp
 )
 target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)
 target_compile_options(aerotwin_core_tests PRIVATE

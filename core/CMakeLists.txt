@@ -20,6 +20,7 @@ set_target_properties(Eigen3::Eigen PROPERTIES
 
 add_library(aerotwin_core STATIC
     src/common/Version.cpp
+    src/math/Rotations.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC

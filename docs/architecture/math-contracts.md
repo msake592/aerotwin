@@ -1,7 +1,8 @@
 # Mathematical types and unit contracts
 
 Status: M1.2 types and validation implemented; transformation API below is a design
-draft only. Quaternion algorithms belong to M1.3; frame transformations to M1.4.
+draft only. [M1.3 quaternion operations](quaternion-rotations.md) are implemented
+and pending review; frame transformations remain M1.4 work.
 
 ## Public types
 
@@ -11,9 +12,9 @@ Include `<aerotwin/math/Types.hpp>` and link `aerotwin_core`.
 (`i*j = k`) and constructor order `(w, x, y, z)`. Interchange order is always
 `[w, x, y, z]`: read/write named accessors explicitly. Eigen's `coeffs()` and raw
 storage are **[x, y, z, w]** and must not be copied as the interchange format.
-No serialization helper or AeroTwin quaternion operations are implemented here.
-Eigen exposes operations through these aliases; this is not validation of those
-operations for AeroTwin use.
+No serialization helper is implemented. Checked operations are provided separately
+in `<aerotwin/math/Rotations.hpp>`. Raw Eigen operations remain accessible through
+these aliases and bypass AeroTwin validation.
 
 Aliases preserve Eigen interoperability without duplicate arithmetic or wrapper
 ownership. They do not enforce units, frames, point semantics, or normalization at
@@ -57,8 +58,9 @@ Positive rotations follow the right-hand rule. `q_world_from_body` actively maps
 body components into world components:
 `v_world = q_world_from_body * (0, v_body) * conjugate(q_world_from_body)`.
 The inverse maps world to body. Both quaternion signs describe the same attitude;
-no sign canonicalization is required. Frame conversion and basis/rotation tests
-remain M1.3/M1.4 work. See [coordinate frames](coordinate-frames.md).
+no sign canonicalization is required. Basis-vector and rotation tests are covered
+for rotation primitives in M1.3; full frame conversions remain M1.4 work.
+See [coordinate frames](coordinate-frames.md).
 
 ## Minimal transformation API draft (not compiled or callable)
 
@@ -70,8 +72,8 @@ target coordinates). A future interface should separate these operations:
 // Design sketch only: no declarations or implementations are shipped.
 Vector3 transformPoint(const RigidTransform& target_from_source,
                        const Vector3& point_source_m);
-Vector3 rotateVector(const Quaternion& q_target_from_source,
-                     const Vector3& vector_source);
+// Use the implemented M1.3 rotateVector(q_target_from_source, vector_source)
+// for the rotation part; it returns std::optional<Vector3>.
 ```
 
 The point contract is `p_target = R_target_from_source * p_source + t_target_m`;
@@ -99,8 +101,11 @@ Eigen values permanently valid and must never read uninitialized values. Directi
 unit-length checks, angle ranges, frame compatibility, and operation-specific
 error reporting remain the consuming API's responsibility. Future operations must
 report invalid input explicitly rather than silently replace it with identity or
-zero; M1.3/M1.4 will choose their concrete error interfaces. No universal epsilon,
-assert-only enforcement, or implicit normalization is introduced.
+zero. M1.3 uses `std::optional` for failures and explicitly documents correction of
+accepted unit-norm drift; M1.4 will choose its transform error interface. No
+universal epsilon or assert-only enforcement is introduced. M1.2 predicates do
+not normalize; M1.3 rotation operations follow their documented bounded correction
+policy.
 
 ## Example (implemented API)
 
