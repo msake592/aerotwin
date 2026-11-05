@@ -1,6 +1,6 @@
 # ADR 0005: Use pinned Eigen headers for core linear algebra
 
-Status: Proposed (M1.1 implementation pending review/merge and hosted CI)
+Status: Accepted (M1.1 merged into main through [PR #3](https://github.com/msake592/aerotwin/pull/3))
 
 ## Context
 
