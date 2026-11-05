@@ -4,7 +4,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M0 — Project Foundation
 
-**Status:** Complete (locally verified; pending PR review/merge)
+**Status:** Complete
 
 **Objective:** Establish a documented and reviewable engineering foundation.
 
@@ -74,7 +74,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ### Step 0.8 — Architecture Review & M0 Readiness
 
-**Status:** Complete (locally verified; pending PR review/merge)
+**Status:** Complete
 
 - [x] Document the [architecture review and M1 readiness](../architecture/m0-review.md).
 - [x] Record standalone core, deferred middleware, Python, frames, and simulation-time decisions.
@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** Not Started
+**Status:** In Progress (M1.1 pending review/merge and CI)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -94,6 +94,32 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 **Deliverables:** Reviewed contracts, tested primitives, reproducible minimal simulation examples.
 
 **Definition of done:** Numerical and frame tests pass; repeated seeded runs reproduce the documented baseline without ROS 2.
+
+### Step M1.1 — Eigen Integration
+
+**Status:** Implemented and locally verified; pending PR review/merge and hosted CI. Not DONE.
+
+Eigen 3.4.0 is fetched from its official release archive with SHA-256 verification.
+The header-only `Eigen3::Eigen` target is a public dependency of `aerotwin_core`.
+Eigen's standalone project is skipped; no Eigen tests, benchmarks, or examples are configured.
+Five deterministic GoogleTest smoke tests cover construction/component access, addition,
+dot product, matrix-vector multiplication, and identity behavior. C++20 and the existing
+presets and CI jobs are preserved. No mathematical wrappers or later M1 steps are implemented.
+
+**Local verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4,
+Unix Makefiles. `cmake --preset dev-debug`, `cmake --build --preset dev-debug`,
+`ctest --preset dev-debug`, and the equivalent Release commands passed: 8/8 tests
+in each configuration, including all three existing version regressions. Both
+examples printed `AeroTwin version: 0.1.0-dev`. A fresh
+`cmake -S . -B build/m1-no-tests -DBUILD_TESTING=OFF`, build, and example passed;
+no GoogleTest dependency was populated and CTest registered zero tests.
+After repairing the existing virtual environment with
+`.venv/bin/python -m pip install -e '.[dev]'`, pytest passed 3/3 cases and Ruff
+lint/format checks passed (Python 3.14.5, pytest 9.2.0, Ruff 0.17.3).
+`pip check` and `git diff --check` passed. The initial sandboxed CMake download
+stalled; configuration succeeded with approved network access. Existing CI jobs
+are unchanged. Ubuntu, GitHub-hosted macOS, Python 3.11/3.13, and minimum CMake 3.20
+were not tested for this change; hosted CI remains pending.
 
 ## M2 — Sensor Simulation & State Estimation
 

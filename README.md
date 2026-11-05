@@ -30,7 +30,7 @@ Gazebo is intended to supply simulation and ground truth; PX4 SITL will provide 
 
 | Area | Planned tools |
 | --- | --- |
-| Core | C++20 and CMake (implemented); Eigen (planned) |
+| Core | C++20 and CMake (implemented); Eigen 3.4.0 (integrated; M1.1 pending review/merge and CI) |
 | Integration | ROS 2, Gazebo, PX4 SITL |
 | Experiments and analysis | Python |
 | Tests | GoogleTest, CTest, and pytest (implemented) |
@@ -40,14 +40,14 @@ CMake 3.20+ and a C++20 compiler are required for the current build. Robotics de
 
 ## Current development status
 
-M0 — Project Foundation is **Complete (locally verified; pending PR review/merge)**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the [architecture review and M1 readiness](docs/architecture/m0-review.md). Simulation, EKF, navigation, and ROS 2 packages remain planned.
+M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the [architecture review and M1 readiness](docs/architecture/m0-review.md). Simulation, EKF, navigation, and ROS 2 packages remain planned.
 
 ## Development roadmap
 
 | Milestone | Focus | Status |
 | --- | --- | --- |
-| M0 | Project Foundation | Complete (locally verified; pending PR review/merge) |
-| M1 | Mathematical & Simulation Foundations | Not Started |
+| M0 | Project Foundation | Complete |
+| M1 | Mathematical & Simulation Foundations | In Progress (M1.1 pending review/merge and CI) |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
@@ -80,7 +80,9 @@ See the [detailed roadmap](docs/roadmap/ROADMAP.md) and [milestone dependencies]
 - A C++20-capable compiler (AppleClang, Clang, GCC, or MSVC).
 - Make for the supplied presets. On macOS, the Xcode Command Line Tools provide the compiler, SDK, and Make.
 
-The standalone core requires no third-party library. Testing is enabled by default and downloads pinned GoogleTest v1.18.0 using CMake FetchContent; network access is needed on first configuration of each build directory. A system-wide GoogleTest installation is unnecessary. Downloads and compiled dependencies stay under ignored `build/`. No ROS 2, Gazebo, PX4, CUDA, or Eigen is required. Ninja is optional and is not required by the presets.
+The standalone core uses header-only Eigen 3.4.0, pinned by archive SHA-256 and automatically downloaded from the official GitLab release archive using CMake FetchContent. It is exposed through the public `Eigen3::Eigen` dependency of `aerotwin_core`, so consumers need no global include paths or system Eigen installation. Only the headers are consumed; Eigen’s standalone CMake project is skipped to avoid configuring its tests, benchmarks, examples, and compiler settings. A fresh build directory requires network access even with testing disabled. See [ADR 0005](docs/adr/0005-eigen-integration.md) for the integration decision.
+
+Testing is enabled by default and downloads pinned GoogleTest v1.18.0 using CMake FetchContent; network access is needed on first configuration of each build directory. A system-wide GoogleTest installation is unnecessary. Downloads and compiled dependencies stay under ignored `build/`. No ROS 2, Gazebo, PX4, or CUDA is required. Ninja is optional and is not required by the presets.
 
 ### Configure, build, and run
 
@@ -178,6 +180,8 @@ Follow the [local CI commands and failure triage guide](CONTRIBUTING.md#continuo
 ## Testing status
 
 Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Step 0.7 also verified a fresh editable install, all three pytest cases, and both Ruff checks on Apple Silicon macOS with Python 3.13.1. The hosted Ubuntu jobs passed for Python 3.11 and 3.13.
+
+Five Eigen smoke tests cover vector construction/access, addition, dot product, matrix-vector multiplication, and identity behavior. M1.1 remains pending review/merge and hosted CI. Mathematical type contracts and simulation behavior remain planned.
 
 The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 
