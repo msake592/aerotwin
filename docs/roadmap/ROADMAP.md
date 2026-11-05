@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.1 pending review/merge and CI)
+**Status:** In Progress (M1.2 pending review)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -97,7 +97,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ### Step M1.1 — Eigen Integration
 
-**Status:** Implemented and locally verified; pending PR review/merge and hosted CI. Not DONE.
+**Status:** Merged in [PR #3](https://github.com/msake592/aerotwin/pull/3) at `0ad7fd5`. Local verification recorded below; hosted CI result not rechecked for M1.2.
 
 Eigen 3.4.0 is fetched from its official release archive with SHA-256 verification.
 The header-only `Eigen3::Eigen` target is a public dependency of `aerotwin_core`.
@@ -120,6 +120,30 @@ lint/format checks passed (Python 3.14.5, pytest 9.2.0, Ruff 0.17.3).
 stalled; configuration succeeded with approved network access. Existing CI jobs
 are unchanged. Ubuntu, GitHub-hosted macOS, Python 3.11/3.13, and minimum CMake 3.20
 were not tested for this change; hosted CI remains pending.
+
+### Step M1.2 — Mathematical Types & Unit Contracts
+
+**Status:** Implemented and locally verified; pending PR merge and successful hosted CI. Not DONE.
+
+- Eigen double-precision `Vector3` and Hamilton `Quaternion` aliases with explicit initialization requirements.
+- Finite-vector and unit-quaternion validation without implicit repair.
+- [Unit/frame/point contracts and transformation API draft](../architecture/math-contracts.md).
+- [ADR 0006](../adr/0006-math-type-contracts.md) records aliases versus wrappers and invariant ownership.
+- Quaternion operations (M1.3), frame transformations (M1.4), clocks, and simulation remain unimplemented.
+
+**Local verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4.
+`cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and
+`ctest --preset dev-debug` passed; equivalent Release commands passed. Both suites
+passed 14/14 cases (all 8 existing tests plus 6 new contract tests). The existing
+`build/m1-no-tests` configuration rebuilt with `BUILD_TESTING=OFF`; that example
+and both preset examples printed `AeroTwin version: 0.1.0-dev` successfully.
+Python 3.14.5 / pytest 9.2.0: `.venv/bin/python -m pytest` passed 3/3 after
+repairing the missing editable package with `.venv/bin/python -m pip install -e '.[dev]'`.
+An initial no-build-isolation repair could not import missing setuptools; the
+standard isolated installation succeeded with approved network access.
+Ruff 0.17.3: `.venv/bin/ruff check .` and `.venv/bin/ruff format --check .`
+passed; `pip check` and `git diff --check` passed. No existing tests were removed.
+Other platforms, Python 3.11/3.13, minimum CMake, and hosted M1.2 CI were not run.
 
 ## M2 — Sensor Simulation & State Estimation
 

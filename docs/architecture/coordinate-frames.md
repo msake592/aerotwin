@@ -1,6 +1,7 @@
 # Coordinate frame conventions
 
-Status: proposed conventions and interface requirements. No transformations are implemented.
+Status: M1.2 type and unit contracts implemented; transformations remain planned. See
+[mathematical contracts](math-contracts.md) for public types, validation, and API draft.
 
 | Frame | Axes | Intended use |
 | --- | --- | --- |
@@ -14,4 +15,4 @@ All listed conventions are right-handed. ENU/NED world frames and FLU/FRD body f
 
 Future adapters must explicitly convert between declared source and destination frames. Interfaces must document vector expression frame, pose reference frame, transform direction, sensor extrinsics, and covariance ordering. For interchange, serialize unit quaternions as `[w, x, y, z]` using the Hamilton convention. A body attitude actively maps body-frame vectors into world coordinates using `v_world = q * v_body * conjugate(q)`, with vectors embedded as pure quaternions. The inverse maps world vectors into body coordinates. Serialize components explicitly at library and adapter boundaries.
 
-Use metres for position, metres per second for velocity, radians for angles, and radians per second for angular rates. Declare the expression frame and units for noise and covariance as well. Use [run-relative simulation time](../adr/0004-simulation-time.md) for observations and states. These conventions define future contracts and still require implementation and tests.
+Use metres for position, metres per second for velocity, radians for angles, and radians per second for angular rates. Declare the expression frame and units for noise and covariance as well. Use [run-relative simulation time](../adr/0004-simulation-time.md) for observations and states. Rotation and transformation algorithms and their tests remain deferred to M1.3/M1.4.
