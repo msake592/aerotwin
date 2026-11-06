@@ -1,6 +1,6 @@
 # ADR 0003: Declare coordinate frames and attitude conventions
 
-Status: Accepted as a design convention (implementation and tests pending)
+Status: Accepted as a design convention (M1.4 body/world transformations implemented, pending review; external adapters remain planned)
 
 ## Context
 
