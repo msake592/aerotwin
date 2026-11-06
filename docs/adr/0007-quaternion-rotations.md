@@ -1,6 +1,6 @@
 # ADR 0007: Checked quaternion rotation operations
 
-Status: Proposed (M1.3 implemented; pending review)
+Status: Accepted (M1.3 merged in PR #6; all four CI jobs passed)
 
 ## Context
 

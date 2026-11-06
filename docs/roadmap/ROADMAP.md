@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.2 DONE; M1.3 pending review)
+**Status:** In Progress (M1.3 merged; M1.4 pending review)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -149,7 +149,7 @@ Other platforms, Python 3.11/3.13, minimum CMake, and hosted M1.2 CI were not ru
 
 ### Step M1.3 — Quaternion & Rotation Mathematics
 
-**Status:** Implemented and locally verified; pending review, merge, and hosted CI. Not DONE.
+**Status:** Merged in [PR #6](https://github.com/msake592/aerotwin/pull/6) at `65f5109`; all four jobs passed in [CI run 42124882965](https://github.com/msake592/aerotwin/actions/runs/42124882965).
 
 Four checked operations normalize, compose (`after * before`), invert, and rotate
 vectors using existing Eigen aliases and Hamilton conventions. `std::optional`
@@ -183,6 +183,46 @@ package via `.venv/bin/python -m pip install -e '.[dev]'` with approved network
 access. Ruff 0.17.3 lint and format checks, `pip check`, and `git diff --check`
 passed. Changed documentation's relative file links were checked. Hosted M1.3 CI,
 other platforms, Python 3.11/3.13, and minimum CMake 3.20 were not exercised.
+
+### Step M1.4 — ENU/FLU Coordinate Transformations
+
+**Status:** Implemented and locally verified; IN PROGRESS / pending technical review.
+Not DONE. Technical review found no blocking issues; GitHub integration is
+authorized, with successful hosted CI and merge still required.
+
+- Four checked body/world point and vector functions reuse M1.3 rotations.
+- Explicit active `q_world_from_body`, translation in world metres, and optional failures.
+- [Coordinate contracts and usage](../architecture/coordinate-frames.md) document
+  numerical limits and PX4 NED/FRD boundary mappings; no adapter is implemented.
+- [ADR 0008](../adr/0008-coordinate-transformations.md) records the small API and
+  rejection of nonfinite translation/subtraction intermediates.
+- Fourteen new tests cover identity, all axes, quarter turns, inverse direction,
+  translation order, round trips, invalid inputs, accepted quaternion drift,
+  overflow, subnormals, mixed magnitudes, cancellation, and lost small offsets.
+  The final integration regression verifies M1.3 internal-overflow recovery through
+  all four M1.4 operations, using zero translation.
+
+**Prerequisites:** Verified PR #6 merged at `65f5109` and all four CI jobs passed
+via GitHub before changes. No open PRs (including documentation-only prerequisites)
+were present. Switched to `main`, ran `git pull --ff-only origin main`, verified
+clean state and merge ancestry, then created `feature/m1-coordinate-transformations`.
+
+**Local verification:** Apple Silicon macOS, AppleClang 21.0.0, CMake/CTest 4.4.4.
+`cmake --preset dev-debug`, `cmake --build --preset dev-debug`, and
+`ctest --preset dev-debug` passed; equivalent Release commands passed. Both suites
+passed 49/49 tests (35 preserved plus 14 new). Configured and built
+`build/m1-no-tests` with `cmake -S . -B build/m1-no-tests -DBUILD_TESTING=OFF` and
+`cmake --build build/m1-no-tests`; CTest listed zero tests. All three configurations'
+examples printed `AeroTwin version: 0.1.0-dev` and exited successfully.
+Python 3.14.5 / pytest 9.2.0: `.venv/bin/python -m pytest` passed 3/3.
+Ruff 0.17.3: `.venv/bin/ruff check .` and `.venv/bin/ruff format --check .` passed;
+`pip check`, changed documentation file-link checks, and `git diff --check` passed.
+The editable installation was restored with `.venv/bin/python -m pip install -e '.[dev]'`
+(network access was required after sandbox DNS failure). Import still failed because
+macOS marked the editable `.pth` file hidden and Python skipped it; clearing that
+flag on the generated `.venv` file fixed collection. No packaging changes were made.
+Hosted M1.4 CI, Linux, Python 3.11/3.13, and minimum CMake 3.20 were not exercised.
+M1.5 and all later functionality remain deferred.
 
 ## M2 — Sensor Simulation & State Estimation
 

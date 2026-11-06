@@ -1,7 +1,8 @@
 # Quaternion and rotation mathematics
 
-Status: M1.3 implemented; pending review, merge, and hosted CI. Full frame
-transformations remain M1.4 work. Include `<aerotwin/math/Rotations.hpp>` and link
+Status: M1.3 merged in PR #6 with all four CI jobs passing. M1.4
+[body/world transformations](coordinate-frames.md) are implemented, pending review.
+Include `<aerotwin/math/Rotations.hpp>` and link
 `aerotwin_core`. No dependencies beyond C++20 and the existing Eigen are added.
 
 ## API and failure policy
@@ -120,7 +121,7 @@ if (composed) {
 These are rotation primitives for the existing world ENU/body FLU contracts.
 `rotateVector(q_world_from_body, v_body)` expresses body components in world axes
 when the supplied attitude has that meaning. There is no hardcoded ENU/FLU basis
-conversion. Rigid transforms, point translation, ENU/NED and FLU/FRD conversion,
-origins, timestamps, and kinematics are not implemented. M1.4 can build on these
-checked primitives and must choose its own concrete transform storage and failure
-contract. See [mathematical contracts](math-contracts.md).
+conversion. Point translation is provided by M1.4's four explicit functions with
+optional failures, without adding transform storage. ENU/NED and FLU/FRD adapters,
+origin ownership, timestamps, and kinematics remain deferred.
+See [mathematical contracts](math-contracts.md).

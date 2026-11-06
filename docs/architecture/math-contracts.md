@@ -1,8 +1,7 @@
 # Mathematical types and unit contracts
 
-Status: M1.2 types and validation implemented; transformation API below is a design
-draft only. [M1.3 quaternion operations](quaternion-rotations.md) are implemented
-and pending review; frame transformations remain M1.4 work.
+Status: M1.2 types and validation and M1.3 rotations are merged. M1.4 checked
+[coordinate transformations](coordinate-frames.md) are implemented, pending review.
 
 ## Public types
 
@@ -59,30 +58,18 @@ body components into world components:
 `v_world = q_world_from_body * (0, v_body) * conjugate(q_world_from_body)`.
 The inverse maps world to body. Both quaternion signs describe the same attitude;
 no sign canonicalization is required. Basis-vector and rotation tests are covered
-for rotation primitives in M1.3; full frame conversions remain M1.4 work.
+for rotation primitives in M1.3; M1.4 tests cover body/world point and vector mappings.
 See [coordinate frames](coordinate-frames.md).
 
-## Minimal transformation API draft (not compiled or callable)
+## Coordinate transformations
 
-The intended rigid transform `T_target_from_source` carries
-`q_target_from_source` and `translation_target_m` (the source origin expressed in
-target coordinates). A future interface should separate these operations:
-
-```cpp
-// Design sketch only: no declarations or implementations are shipped.
-Vector3 transformPoint(const RigidTransform& target_from_source,
-                       const Vector3& point_source_m);
-// Use the implemented M1.3 rotateVector(q_target_from_source, vector_source)
-// for the rotation part; it returns std::optional<Vector3>.
-```
-
-The point contract is `p_target = R_target_from_source * p_source + t_target_m`;
-the vector contract is `v_target = R_target_from_source * v_source`, retaining the
-input vector's units. Directions follow the vector contract. This is a rigid
-coordinate mapping, not moving-frame velocity kinematics. Transforms require
-compatible frames and the same event time. Composition, inverse, concrete transform
-storage, ENU/NED and FLU/FRD conversions, and failure-return types are deferred to
-M1.4 rather than exposing symbols that fail at link time today.
+Include `<aerotwin/math/Transformations.hpp>`. The four checked functions
+`bodyToWorldVector`, `worldToBodyVector`, `bodyToWorldPoint`, and
+`worldToBodyPoint` return `std::optional<Vector3>` and use `q_world_from_body`
+in both directions. See [coordinate frames](coordinate-frames.md) for signatures,
+formulas, translation, failures, numerical limits, and PX4 boundary conventions.
+No transform storage type or composition API is needed for these operations.
+Moving-frame kinematics, adapters, and timestamp ownership remain future work.
 
 ## Invalid values and invariants
 
@@ -102,7 +89,7 @@ unit-length checks, angle ranges, frame compatibility, and operation-specific
 error reporting remain the consuming API's responsibility. Future operations must
 report invalid input explicitly rather than silently replace it with identity or
 zero. M1.3 uses `std::optional` for failures and explicitly documents correction of
-accepted unit-norm drift; M1.4 will choose its transform error interface. No
+accepted unit-norm drift; M1.4 preserves this optional failure interface. No
 universal epsilon or assert-only enforcement is introduced. M1.2 predicates do
 not normalize; M1.3 rotation operations follow their documented bounded correction
 policy.
