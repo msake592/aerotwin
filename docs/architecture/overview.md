@@ -1,6 +1,8 @@
 # Intended architecture
 
-Status: design intent only; no runtime components are implemented.
+The standalone M1 core implements deterministic scenario execution and truth
+telemetry locally. The middleware, sensing, estimation, and autonomy architecture
+below describes future work. See the [M1 data flow](data-flow.md).
 
 AeroTwin will separate a standalone C++ algorithm core from simulation and middleware integration. The core will expose explicit interfaces for mathematical utilities, sensor observations, estimation, autonomy, and validation. It must be testable without ROS 2, Gazebo, or PX4.
 

@@ -10,3 +10,4 @@ include(CTest)
 
 add_subdirectory(core)
 add_subdirectory(examples/basic_core)
+add_subdirectory(examples/motion_demo)

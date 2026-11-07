@@ -47,7 +47,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
-| M1 | Mathematical & Simulation Foundations | In Progress (M1.6 DONE, M1.7 pending technical review) |
+| M1 | Mathematical & Simulation Foundations | In Progress (M1.1–M1.7 done, M1.8–M1.9 pending technical review, hosted CI, and merge) |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
@@ -109,7 +109,32 @@ cmake --build build/native-debug --config Debug
 
 `CMAKE_BUILD_TYPE` selects the configuration for single-configuration generators. For multi-configuration generators such as Visual Studio, `--config Debug` selects it at build time; run `build/native-debug/examples/basic_core/Debug/aerotwin_basic_core.exe`. Use a separate directory and `Release` in place of `Debug` for an equivalent Release build. The hosted Debug matrix also passed on Ubuntu 24.04.
 
-There are no installation or simulation launch commands yet.
+### Headless motion demo
+
+M1.8 and M1.9 are implemented locally and pending technical review. The scenario
+runner owns the simulation clock, calls the kinematic integrator at each fixed
+step, and records validated ground-truth snapshots. A separate exporter writes
+schema-versioned telemetry with explicit ENU/FLU frames and SI units.
+
+```sh
+cmake --preset dev-debug
+cmake --build --preset dev-debug --target aerotwin_motion_demo
+output_parent=$(mktemp -d)
+build/dev-debug/examples/motion_demo/aerotwin_motion_demo "$output_parent/m1_motion_demo"
+```
+
+The reference run produces 101 samples over 10 simulated seconds. Expect a final
+position near `(30, 5, 7)` metres and an orientation equivalent to a positive
+90-degree rotation about Z. The output directory contains `truth_trajectory.csv`
+and `run_metadata.txt`. Omit the argument to use `aerotwin_m1_motion_demo` in the
+system temporary directory. The parent must exist and the destination must be
+new, so repeat runs need a fresh destination. Shared writable parents must have
+sticky-bit protection and be owned by you or root.
+
+Replays with the same executable and floating-point environment produce identical
+CSV bytes. Results can differ across architectures and toolchains. See the
+[scenario and telemetry contract](docs/architecture/scenario-telemetry.md) and
+[M1 technical report](docs/reports/m1-deterministic-motion-report.md).
 
 ### Unit tests
 
@@ -195,9 +220,9 @@ for construction, frames, and units.
 M1.7 adds deterministic constant-velocity propagation in
 `<aerotwin/simulation/KinematicIntegrator.hpp>`. See the
 [integrator contract](docs/architecture/kinematic-integrator.md) for the motion,
-time, and failure policies. M1.7 is pending technical review.
+time, and failure policies. M1.7 merged in [PR #11](https://github.com/msake592/aerotwin/pull/11).
 
-The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
+The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Four motion pipeline integration cases cover stationary, straight-line, rotation-in-place, and combined motion. Future functionality must include relevant tests; no performance or reliability results are claimed.
 
 ## License
 
