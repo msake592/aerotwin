@@ -1,11 +1,11 @@
 # Constant-velocity kinematic integration
 
-M1.7 is pending technical review. Include
+M1.7 merged in [PR #11](https://github.com/msake592/aerotwin/pull/11). Include
 `<aerotwin/simulation/KinematicIntegrator.hpp>` and link `aerotwin_core`.
 `aerotwin::integrateConstantVelocity(initial_state, target_timestamp)` is a pure
 operation that returns `std::optional<VehicleState>`. It propagates simulator
 ground truth. The caller supplies event times and owns clock advancement, resets,
-and future scenario scheduling.
+and [scenario scheduling](scenario-telemetry.md).
 
 ## Motion and frames
 

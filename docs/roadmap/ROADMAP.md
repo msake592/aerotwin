@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implements constant-velocity propagation and is pending technical review. Scenario execution, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implemented constant-velocity propagation. M1.8 and M1.9 add deterministic scenario execution, truth telemetry, and a headless demo locally. Estimation and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.6 DONE, M1.7 pending technical review)
+**Status:** In Progress (M1.1–M1.7 done, M1.8–M1.9 pending technical review, hosted CI, and merge)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -255,11 +255,26 @@ The matrix covered C++ Debug on Ubuntu 24.04 and macOS 15 and Python 3.11 and 3.
 
 ### Step M1.7 — Kinematic Integrator
 
-**Status:** IN PROGRESS, pending technical review.
+**Status:** DONE. Merged in [PR #11](https://github.com/msake592/aerotwin/pull/11) at `faeaad3`. All four hosted jobs passed in [CI run 42407157348](https://github.com/msake592/aerotwin/actions/runs/42407157348).
 
 The standalone core propagates a ground-truth vehicle state to a caller-supplied
 timestamp with constant world linear velocity and body angular velocity. See the
 [integrator contract](../architecture/kinematic-integrator.md).
+
+### Step M1.8 — Deterministic Scenario and Truth Telemetry
+
+**Status:** Implemented locally, pending technical review.
+
+The runner records the initial snapshot and one validated snapshot per clock step.
+See the [scenario and telemetry contract](../architecture/scenario-telemetry.md).
+The phase gate passed 83/83 Debug and 83/83 Release tests before demo development.
+
+### Step M1.9 — End-to-End Deterministic 3D Motion Demo
+
+**Status:** Implemented locally, pending technical review.
+
+The headless reference scenario was verified against independent analytical
+position and orientation results. See the [technical report](../reports/m1-deterministic-motion-report.md).
 
 ## M2 — Sensor Simulation & State Estimation
 

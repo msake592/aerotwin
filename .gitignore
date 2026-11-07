@@ -33,6 +33,8 @@ htmlcov/
 
 # Generated results; keep source configs, schemas, and sample data trackable
 /outputs/
+truth_trajectory.csv
+run_metadata.txt
 /experiments/reports/generated/
 /simulation/generated/
 /data/generated/

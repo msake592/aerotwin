@@ -3,7 +3,7 @@
 | Milestone | Deliverable focus | Depends on | Status |
 | --- | --- | --- | --- |
 | M0 — Project Foundation | Structure, build/test/CI, and architecture review | None | Complete |
-| M1 — Mathematical & Simulation Foundations | Contracts, tested mathematics, minimal deterministic simulation | M0 | In Progress (M1.6 DONE, M1.7 pending technical review) |
+| M1 — Mathematical & Simulation Foundations | Contracts, tested mathematics, minimal deterministic simulation | M0 | In Progress (M1.1–M1.7 done, M1.8–M1.9 pending technical review, hosted CI, and merge) |
 | M2 — Sensor Simulation & State Estimation | Sensor models, custom estimator, uncertainty evaluation | M1 | Not Started |
 | M3 — Gazebo, PX4 & ROS 2 Integration | Validated stack and adapters | M1, M2 | Not Started |
 | M4 — Uncertainty-Aware Autonomous Navigation | Navigation using estimates and uncertainty | M2, M3 | Not Started |

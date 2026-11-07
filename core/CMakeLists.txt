@@ -25,6 +25,8 @@ add_library(aerotwin_core STATIC
     src/simulation/SimulationClock.cpp
     src/simulation/VehicleState.cpp
     src/simulation/KinematicIntegrator.cpp
+    src/simulation/ScenarioRunner.cpp
+    src/telemetry/TruthTelemetry.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC

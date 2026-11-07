@@ -1,6 +1,22 @@
-# Intended data flow
+# Data flow
 
-Status: conceptual flow; no connections or runtime behavior exist yet.
+## Standalone M1 pipeline
+
+```text
+ScenarioConfig -> runScenario -> ScenarioResult -> exportTruthTelemetry
+                       |               |                 |
+                       |               |                 +-> CSV and metadata
+                       |               +-> ordered VehicleState snapshots
+                       +-> owned SimulationClock
+                       +-> integrateConstantVelocity
+```
+
+The caller owns the configuration and destination. The runner owns a clock and
+calls the pure kinematic integrator to produce each validated truth snapshot.
+The exporter reads the result without mutating it and owns file I/O. See the
+[scenario and telemetry contract](scenario-telemetry.md).
+
+## Planned integration flow
 
 1. Experiment tools select scenario configuration, seeds, and run metadata.
 2. Gazebo evolves simulated dynamics and produces sensor observations and ground truth on distinct channels.
