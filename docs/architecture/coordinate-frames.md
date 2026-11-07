@@ -1,6 +1,7 @@
 # Coordinate frame conventions
 
-Status: M1.4 implemented, pending technical review; not DONE. M1.3 merged in
+Status: M1.4 DONE, merged in [PR #7](https://github.com/msake592/aerotwin/pull/7).
+M1.3 merged in
 [PR #6](https://github.com/msake592/aerotwin/pull/6), with all four
 [CI jobs passing](https://github.com/msake592/aerotwin/actions/runs/42124882965).
 See [mathematical contracts](math-contracts.md) for types and units.

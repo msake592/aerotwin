@@ -1,7 +1,7 @@
 # Mathematical types and unit contracts
 
 Status: M1.2 types and validation and M1.3 rotations are merged. M1.4 checked
-[coordinate transformations](coordinate-frames.md) are implemented, pending review.
+[coordinate transformations](coordinate-frames.md) are merged.
 
 ## Public types
 
