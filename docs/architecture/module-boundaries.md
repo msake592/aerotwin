@@ -1,11 +1,14 @@
 # Intended module boundaries
 
-Status: planned responsibilities, with a version-reporting C++ library, a Python package scaffold, and their unit tests implemented. Algorithm and integration modules remain unimplemented.
+The standalone core implements math primitives, the simulation clock, and the
+[vehicle truth snapshot](../adr/0009-vehicle-state.md). The Python experiment
+package is a scaffold. The table also describes planned module responsibilities.
 
 | Location | Responsibility | Boundary |
 | --- | --- | --- |
 | `core/.../common` | Shared data contracts and basic utilities | No middleware types |
 | `core/.../math` | Numerical and geometric primitives | Explicit units and frames |
+| `core/.../simulation` | Simulation clock and vehicle ground truth | Future sensor models may derive measurements from truth. Estimators receive measurements through separate contracts. |
 | `core/.../sensors` | Sensor observation and model interfaces | Noise assumptions documented; truth kept distinct |
 | `core/.../estimation` | Custom state estimation and uncertainty | Independent of PX4's internal estimator |
 | `core/.../autonomy` | Decisions and navigation | Consume estimates through explicit interfaces |

@@ -1,6 +1,6 @@
 # ADR 0004: Use run-relative simulation timestamps
 
-Status: Accepted design convention. M1.5 clock implementation pending technical review.
+Status: Accepted design convention. M1.5 clock implementation merged in [PR #9](https://github.com/msake592/aerotwin/pull/9).
 
 ## Context
 
