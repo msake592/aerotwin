@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.4 DONE)
+**Status:** In Progress (M1.4 DONE, M1.5 pending review)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -225,7 +225,19 @@ Linux, Python 3.11/3.13, and minimum CMake 3.20 were not exercised locally.
 
 **Hosted verification:** All four jobs passed in [CI run 42315065554](https://github.com/msake592/aerotwin/actions/runs/42315065554): C++ Debug/CTest on Ubuntu 24.04 and macOS 15, and pytest plus Ruff on Ubuntu 24.04 with Python 3.11 and 3.13.
 
-**Next step:** M1.5 — Simulation Clock, governed by [ADR 0004](../adr/0004-simulation-time.md).
+### Step M1.5 — Simulation Clock
+
+**Status:** IN PROGRESS, pending technical review.
+
+The standalone core implements a fixed-step clock with signed 64-bit integer
+nanoseconds, pause and resume, and reset to a new epoch. See the
+[clock API and policies](../adr/0004-simulation-time.md).
+
+**Local verification:** On Apple Silicon macOS, Debug and Release CTest passed
+56/56 tests each, including seven clock tests. The tests-disabled build registered
+zero tests. The version example ran in all three builds. Python 3.14.5 passed
+pytest 3/3, Ruff lint and format checks, and `pip check`. Relative documentation
+file links and `git diff --check` passed.
 
 ## M2 — Sensor Simulation & State Estimation
 
