@@ -1,6 +1,6 @@
 # ADR 0009 — Validated simulator vehicle state
 
-Status is pending PR merge.
+Status: Accepted. Merged in [PR #10](https://github.com/msake592/aerotwin/pull/10).
 
 `aerotwin::VehicleState` belongs to the simulator truth layer. Future sensor
 models may derive measurements from this snapshot. Estimators must receive
@@ -41,9 +41,9 @@ Using the existing aliases keeps interoperability with Eigen and the rotation
 and transformation APIs. An optional result conveys failure without identifying
 the invalid field.
 
-The future M1.7 kinematic integrator can consume one snapshot and construct a new
-validated snapshot for the next simulation timestamp. Clock advancement and
-state propagation are outside the model.
+The [M1.7 kinematic integrator](../architecture/kinematic-integrator.md) consumes
+a snapshot and constructs a new validated snapshot at the supplied timestamp.
+Clock advancement and propagation live outside the state model.
 
 ```cpp
 #include <aerotwin/simulation/VehicleState.hpp>

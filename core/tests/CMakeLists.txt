@@ -25,6 +25,7 @@ add_executable(aerotwin_core_tests
     unit/TransformationsTest.cpp
     unit/SimulationClockTest.cpp
     unit/VehicleStateTest.cpp
+    unit/KinematicIntegratorTest.cpp
 )
 target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)
 target_compile_options(aerotwin_core_tests PRIVATE
