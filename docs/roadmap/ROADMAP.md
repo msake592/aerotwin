@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 has implemented the validated ground-truth vehicle state model locally and is pending PR merge. Vehicle motion, scenario execution, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implements constant-velocity propagation and is pending technical review. Scenario execution, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.5 DONE, M1.6 pending PR merge)
+**Status:** In Progress (M1.6 DONE, M1.7 pending technical review)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -244,15 +244,22 @@ The matrix covered C++ Debug on Ubuntu 24.04 and macOS 15 and Python 3.11 and 3.
 
 ### Step M1.6 — Vehicle State Model
 
-**Status:** IN PROGRESS, pending PR merge.
+**Status:** DONE. Merged in [PR #10](https://github.com/msake592/aerotwin/pull/10) at `f61c52f`.
 
 The standalone core implements a validated ground-truth vehicle snapshot with
 explicit ENU and FLU quantities and an M1.5 timestamp. See the
 [vehicle state contract](../adr/0009-vehicle-state.md).
 
+**Hosted verification:** All four jobs passed in [CI run 42405791742](https://github.com/msake592/aerotwin/actions/runs/42405791742).
+The matrix covered C++ Debug on Ubuntu 24.04 and macOS 15 and Python 3.11 and 3.13 on Ubuntu 24.04.
+
 ### Step M1.7 — Kinematic Integrator
 
-**Status:** TODO.
+**Status:** IN PROGRESS, pending technical review.
+
+The standalone core propagates a ground-truth vehicle state to a caller-supplied
+timestamp with constant world linear velocity and body angular velocity. See the
+[integrator contract](../architecture/kinematic-integrator.md).
 
 ## M2 — Sensor Simulation & State Estimation
 

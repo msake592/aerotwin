@@ -24,6 +24,7 @@ add_library(aerotwin_core STATIC
     src/math/Transformations.cpp
     src/simulation/SimulationClock.cpp
     src/simulation/VehicleState.cpp
+    src/simulation/KinematicIntegrator.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC

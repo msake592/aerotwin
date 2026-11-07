@@ -47,7 +47,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
-| M1 | Mathematical & Simulation Foundations | In Progress (M1.5 DONE, M1.6 pending PR merge) |
+| M1 | Mathematical & Simulation Foundations | In Progress (M1.6 DONE, M1.7 pending technical review) |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
@@ -190,7 +190,12 @@ for the API, pause and reset behavior, and overflow policy.
 
 M1.6 adds a validated simulator ground-truth snapshot in
 `<aerotwin/simulation/VehicleState.hpp>`. See the [vehicle state contract](docs/adr/0009-vehicle-state.md)
-for construction, frames, and units. M1.6 is pending PR merge.
+for construction, frames, and units.
+
+M1.7 adds deterministic constant-velocity propagation in
+`<aerotwin/simulation/KinematicIntegrator.hpp>`. See the
+[integrator contract](docs/architecture/kinematic-integrator.md) for the motion,
+time, and failure policies. M1.7 is pending technical review.
 
 The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 
