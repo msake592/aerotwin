@@ -40,14 +40,14 @@ CMake 3.20+ and a C++20 compiler are required for the current build. Robotics de
 
 ## Current development status
 
-M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the [architecture review and M1 readiness](docs/architecture/m0-review.md). Simulation, EKF, navigation, and ROS 2 packages remain planned.
+M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory structure, engineering guidance, and project documentation. Step 0.4 adds a standalone C++20 static library (`aerotwin_core`), a version-reporting example, and Debug/Release CMake presets. Both builds and example executions have been verified on Apple Silicon macOS. Step 0.5 adds optional GoogleTest unit tests and CTest discovery. Step 0.6 adds an installable Python experiment package, pytest, and Ruff development tooling. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the [architecture review and M1 readiness](docs/architecture/m0-review.md). Simulation execution, EKF, navigation, and ROS 2 packages remain planned.
 
 ## Development roadmap
 
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
-| M1 | Mathematical & Simulation Foundations | In Progress (M1.4 DONE) |
+| M1 | Mathematical & Simulation Foundations | In Progress (M1.4 DONE, M1.5 pending review) |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
@@ -182,6 +182,11 @@ Follow the [local CI commands and failure triage guide](CONTRIBUTING.md#continuo
 Python Step 0.6 verification passed on Apple Silicon macOS using Python 3.14.5, pytest 9.2.0, and Ruff 0.17.3: all three Python tests passed from both the repository root and another directory inside it; linting, formatting, isolated import, and dependency checks passed. The C++ Debug build and its three tests also passed unchanged. Initial sandboxed pip DNS restrictions were resolved with approved network access. Step 0.7 also verified a fresh editable install, all three pytest cases, and both Ruff checks on Apple Silicon macOS with Python 3.13.1. The hosted Ubuntu jobs passed for Python 3.11 and 3.13.
 
 Five Eigen smoke tests cover vector construction/access, addition, dot product, matrix-vector multiplication, and identity behavior. M1.1 merged in [PR #3](https://github.com/msake592/aerotwin/pull/3); its hosted CI status is not asserted here. M1.2 adds Eigen-based `Vector3`/`Quaternion` aliases and explicit validation in `<aerotwin/math/Types.hpp>`. See the [mathematical contracts](docs/architecture/math-contracts.md) for units, ENU/FLU frames, initialization, point semantics, and checked transformations. M1.2 is DONE after [PR #4](https://github.com/msake592/aerotwin/pull/4) merged and all four [CI jobs](https://github.com/msake592/aerotwin/actions/runs/42091533319) passed; M1.3 [checked quaternion rotations](docs/architecture/quaternion-rotations.md) merged in PR #6 with all four CI jobs passed. M1.4 adds [checked ENU/FLU transformations](docs/architecture/coordinate-frames.md). M1.4 is DONE after [PR #7](https://github.com/msake592/aerotwin/pull/7) merged with all four CI jobs passing.
+
+M1.5 adds a deterministic fixed-step simulation clock in
+`<aerotwin/simulation/SimulationClock.hpp>`. The clock uses integer nanoseconds
+and tags each timestamp with its reset epoch. See [ADR 0004](docs/adr/0004-simulation-time.md)
+for the API, pause and reset behavior, and overflow policy. M1.5 is pending technical review.
 
 The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 

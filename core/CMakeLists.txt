@@ -22,6 +22,7 @@ add_library(aerotwin_core STATIC
     src/common/Version.cpp
     src/math/Rotations.cpp
     src/math/Transformations.cpp
+    src/simulation/SimulationClock.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC
