@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.3 merged; M1.4 pending review)
+**Status:** In Progress (M1.4 DONE)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -186,9 +186,9 @@ other platforms, Python 3.11/3.13, and minimum CMake 3.20 were not exercised.
 
 ### Step M1.4 — ENU/FLU Coordinate Transformations
 
-**Status:** Implemented and locally verified; IN PROGRESS / pending technical review.
-Not DONE. Technical review found no blocking issues; GitHub integration is
-authorized, with successful hosted CI and merge still required.
+**Status:** DONE. [PR #7](https://github.com/msake592/aerotwin/pull/7) merged into
+`main` at `2979ff272c86f3f7533807c9534e6f150176e245`, including implementation
+commit `817744ba8b0378ef8e3b3ba524712a66d3187fdb`.
 
 - Four checked body/world point and vector functions reuse M1.3 rotations.
 - Explicit active `q_world_from_body`, translation in world metres, and optional failures.
@@ -221,8 +221,11 @@ The editable installation was restored with `.venv/bin/python -m pip install -e 
 (network access was required after sandbox DNS failure). Import still failed because
 macOS marked the editable `.pth` file hidden and Python skipped it; clearing that
 flag on the generated `.venv` file fixed collection. No packaging changes were made.
-Hosted M1.4 CI, Linux, Python 3.11/3.13, and minimum CMake 3.20 were not exercised.
-M1.5 and all later functionality remain deferred.
+Linux, Python 3.11/3.13, and minimum CMake 3.20 were not exercised locally.
+
+**Hosted verification:** All four jobs passed in [CI run 42315065554](https://github.com/msake592/aerotwin/actions/runs/42315065554): C++ Debug/CTest on Ubuntu 24.04 and macOS 15, and pytest plus Ruff on Ubuntu 24.04 with Python 3.11 and 3.13.
+
+**Next step:** M1.5 — Simulation Clock, governed by [ADR 0004](../adr/0004-simulation-time.md).
 
 ## M2 — Sensor Simulation & State Estimation
 

@@ -1,7 +1,7 @@
 # Quaternion and rotation mathematics
 
 Status: M1.3 merged in PR #6 with all four CI jobs passing. M1.4
-[body/world transformations](coordinate-frames.md) are implemented, pending review.
+[body/world transformations](coordinate-frames.md) are merged.
 Include `<aerotwin/math/Rotations.hpp>` and link
 `aerotwin_core`. No dependencies beyond C++20 and the existing Eigen are added.
 

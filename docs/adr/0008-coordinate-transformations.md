@@ -1,6 +1,6 @@
 # ADR 0008: Explicit checked body/world transformations
 
-Status: Proposed (M1.4 implemented; pending technical review)
+Status: Accepted (M1.4 merged in PR #7)
 
 ## Context
 
