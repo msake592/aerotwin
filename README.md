@@ -47,7 +47,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
-| M1 | Mathematical & Simulation Foundations | In Progress (M1.4 DONE, M1.5 pending review) |
+| M1 | Mathematical & Simulation Foundations | In Progress (M1.5 DONE, M1.6 pending PR merge) |
 | M2 | Sensor Simulation & State Estimation | Not Started |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
@@ -186,7 +186,11 @@ Five Eigen smoke tests cover vector construction/access, addition, dot product, 
 M1.5 adds a deterministic fixed-step simulation clock in
 `<aerotwin/simulation/SimulationClock.hpp>`. The clock uses integer nanoseconds
 and tags each timestamp with its reset epoch. See [ADR 0004](docs/adr/0004-simulation-time.md)
-for the API, pause and reset behavior, and overflow policy. M1.5 is pending technical review.
+for the API, pause and reset behavior, and overflow policy.
+
+M1.6 adds a validated simulator ground-truth snapshot in
+`<aerotwin/simulation/VehicleState.hpp>`. See the [vehicle state contract](docs/adr/0009-vehicle-state.md)
+for construction, frames, and units. M1.6 is pending PR merge.
 
 The initial C++ unit suite checks that `aerotwin::version()` returns a non-null pointer, a non-empty string, and the expected `0.1.0-dev` version. Verified on Apple Silicon macOS with AppleClang 21.0.0 and CMake/CTest 4.4.4: Debug and Release each passed all three tests, and the testing-disabled build and example passed without fetching GoogleTest. CMake 3.20 remains untested. The initial sandboxed fetch failed DNS resolution; approved network access resolved it. Full verification results are recorded in the [roadmap](docs/roadmap/ROADMAP.md). Integration tests remain deferred until meaningful integration behavior exists. Future functionality must include relevant tests; no performance or reliability results are claimed.
 

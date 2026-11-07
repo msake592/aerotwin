@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. Simulation, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 has implemented the validated ground-truth vehicle state model locally and is pending PR merge. Vehicle motion, scenario execution, estimation, and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.4 DONE, M1.5 pending review)
+**Status:** In Progress (M1.5 DONE, M1.6 pending PR merge)
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -227,7 +227,7 @@ Linux, Python 3.11/3.13, and minimum CMake 3.20 were not exercised locally.
 
 ### Step M1.5 — Simulation Clock
 
-**Status:** IN PROGRESS, pending technical review.
+**Status:** DONE. Merged in [PR #9](https://github.com/msake592/aerotwin/pull/9) at `e34c264`.
 
 The standalone core implements a fixed-step clock with signed 64-bit integer
 nanoseconds, pause and resume, and reset to a new epoch. See the
@@ -238,6 +238,21 @@ nanoseconds, pause and resume, and reset to a new epoch. See the
 zero tests. The version example ran in all three builds. Python 3.14.5 passed
 pytest 3/3, Ruff lint and format checks, and `pip check`. Relative documentation
 file links and `git diff --check` passed.
+
+**Hosted verification:** All four jobs passed in [CI run 42385632519](https://github.com/msake592/aerotwin/actions/runs/42385632519).
+The matrix covered C++ Debug on Ubuntu 24.04 and macOS 15 and Python 3.11 and 3.13 on Ubuntu 24.04.
+
+### Step M1.6 — Vehicle State Model
+
+**Status:** IN PROGRESS, pending PR merge.
+
+The standalone core implements a validated ground-truth vehicle snapshot with
+explicit ENU and FLU quantities and an M1.5 timestamp. See the
+[vehicle state contract](../adr/0009-vehicle-state.md).
+
+### Step M1.7 — Kinematic Integrator
+
+**Status:** TODO.
 
 ## M2 — Sensor Simulation & State Estimation
 
