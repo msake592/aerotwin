@@ -28,6 +28,8 @@ add_library(aerotwin_core STATIC
     src/simulation/ScenarioRunner.cpp
     src/telemetry/TruthTelemetry.cpp
     src/sensors/Measurements.cpp
+    src/sensors/Covariance.cpp
+    src/sensors/GaussianNoise.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC

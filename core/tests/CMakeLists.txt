@@ -29,6 +29,7 @@ add_executable(aerotwin_core_tests
     unit/ScenarioRunnerTest.cpp
     unit/TruthTelemetryTest.cpp
     unit/MeasurementsTest.cpp
+    unit/GaussianNoiseTest.cpp
     integration/MotionPipelineTest.cpp
 )
 target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)
