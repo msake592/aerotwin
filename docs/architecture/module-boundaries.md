@@ -12,7 +12,7 @@ package is a scaffold. The table also describes planned module responsibilities.
 | `core/.../math` | Numerical and geometric primitives | Explicit units and frames |
 | `core/.../simulation` | Simulation clock, vehicle ground truth, kinematic propagation, and in-memory scenario execution | Future sensor models may derive measurements from truth. Estimators receive measurements through separate contracts. |
 | `core/.../telemetry` | Versioned truth CSV and run metadata export | File I/O consumes completed scenario results |
-| `core/.../sensors` | Validated GPS and IMU contracts, generation interface, and [deterministic noise](gaussian-noise.md) | Measurement headers are independent of truth state. Sensor models may borrow truth explicitly. |
+| `core/.../sensors` | Validated GPS and IMU contracts, generation interface, [deterministic noise](gaussian-noise.md), and [GPS generation](gps-simulation.md) | Measurement headers are independent of truth state. Sensor models may borrow truth explicitly. |
 | `core/.../estimation` | Custom state estimation and uncertainty | Independent of PX4's internal estimator |
 | `core/.../autonomy` | Decisions and navigation | Consume estimates through explicit interfaces |
 | `core/.../validation` | Metrics and comparison logic | Truth available for evaluation, not implicit estimator input |

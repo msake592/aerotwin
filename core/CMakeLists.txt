@@ -30,6 +30,7 @@ add_library(aerotwin_core STATIC
     src/sensors/Measurements.cpp
     src/sensors/Covariance.cpp
     src/sensors/GaussianNoise.cpp
+    src/sensors/GpsSensor.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC
