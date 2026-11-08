@@ -47,8 +47,8 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | Milestone | Focus | Status |
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
-| M1 | Mathematical & Simulation Foundations | In Progress (M1.1–M1.7 done, M1.8–M1.9 pending technical review, hosted CI, and merge) |
-| M2 | Sensor Simulation & State Estimation | Not Started |
+| M1 | Mathematical & Simulation Foundations | Complete |
+| M2 | Sensor Simulation & State Estimation | In Progress (M2.1 pending technical review) |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
@@ -111,7 +111,7 @@ cmake --build build/native-debug --config Debug
 
 ### Headless motion demo
 
-M1.8 and M1.9 are implemented locally and pending technical review. The scenario
+M1.8 and M1.9 merged in [PR #12](https://github.com/msake592/aerotwin/pull/12). The scenario
 runner owns the simulation clock, calls the kinematic integrator at each fixed
 step, and records validated ground-truth snapshots. A separate exporter writes
 schema-versioned telemetry with explicit ENU/FLU frames and SI units.
@@ -135,6 +135,12 @@ Replays with the same executable and floating-point environment produce identica
 CSV bytes. Results can differ across architectures and toolchains. See the
 [scenario and telemetry contract](docs/architecture/scenario-telemetry.md) and
 [M1 technical report](docs/reports/m1-deterministic-motion-report.md).
+
+### Sensor measurement contracts
+
+M2.1 adds validated GPS and IMU values and a separate generation-side interface.
+See the [measurement contract](docs/architecture/measurements.md) for covariance,
+frame, timestamp, and ownership rules. M2.1 is pending technical review.
 
 ### Unit tests
 

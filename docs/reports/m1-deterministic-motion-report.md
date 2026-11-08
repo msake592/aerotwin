@@ -1,8 +1,8 @@
 # M1 deterministic motion report
 
 M1 establishes a standalone, reproducible C++20 baseline for 3D motion and
-versioned simulator truth. M1.8 and M1.9 have passed local verification and are
-pending technical review, hosted CI, and merge.
+versioned simulator truth. M1.8 and M1.9 passed verification and merged in
+[PR #12](https://github.com/msake592/aerotwin/pull/12).
 
 ## Implemented components
 

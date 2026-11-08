@@ -27,6 +27,7 @@ add_library(aerotwin_core STATIC
     src/simulation/KinematicIntegrator.cpp
     src/simulation/ScenarioRunner.cpp
     src/telemetry/TruthTelemetry.cpp
+    src/sensors/Measurements.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC
