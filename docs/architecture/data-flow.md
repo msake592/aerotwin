@@ -20,7 +20,9 @@ The exporter reads the result without mutating it and owns file I/O. See the
 
 M2.1 defines [GPS and IMU measurements](measurements.md). The [GPS generator](gps-simulation.md)
 borrows truth at a supplied acquisition timestamp and returns an owned
-observation. Estimator inputs carry observations independently of truth.
+observation. The [IMU generator](imu-simulation.md) also requires timestamped
+reference-point acceleration. Estimator inputs carry observations independently
+of truth.
 Scheduling, delivery, and estimation remain planned.
 
 ## Planned integration flow

@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.3 pending technical review)
+**Status:** In Progress (M2.4 pending technical review)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -309,11 +309,18 @@ available to future sensor models. See the
 
 ### Step M2.3 — Deterministic GPS Sensor Simulation
 
-**Status:** Implemented locally, pending review.
+**Status:** Merged in [PR #15](https://github.com/msake592/aerotwin/pull/15) at `0279c92`. All four [hosted checks](https://github.com/msake592/aerotwin/actions/runs/42492713457) passed.
 
 The GPS model samples local ENU position from a supplied truth snapshot and
 preserves acquisition time, sensor identity, and configured covariance. See the
 [GPS simulation contract](../architecture/gps-simulation.md).
+
+### Step M2.4 — Deterministic IMU Sensor Simulation
+
+**Status:** Implemented locally, pending review.
+
+The IMU generates FLU specific force and angular velocity from timestamp-matched
+truth and ENU acceleration. See the [IMU contract](../architecture/imu-simulation.md).
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
