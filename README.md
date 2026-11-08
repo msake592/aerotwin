@@ -48,7 +48,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
-| M2 | Sensor Simulation & State Estimation | In Progress (M2.3 pending technical review) |
+| M2 | Sensor Simulation & State Estimation | In Progress (M2.4 pending technical review) |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
@@ -142,7 +142,8 @@ M2.1 adds validated GPS and IMU values and a separate generation-side interface.
 See the [measurement contract](docs/architecture/measurements.md) for covariance,
 frame, timestamp, and ownership rules. M2.2 adds
 [deterministic Gaussian noise](docs/architecture/gaussian-noise.md). M2.3 adds
-[local ENU GPS simulation](docs/architecture/gps-simulation.md) and is pending
+[local ENU GPS simulation](docs/architecture/gps-simulation.md). M2.4 adds
+[deterministic IMU generation](docs/architecture/imu-simulation.md) and is pending
 technical review.
 
 ### Unit tests
