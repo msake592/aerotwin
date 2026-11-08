@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implemented constant-velocity propagation. M1.8 and M1.9 add deterministic scenario execution, truth telemetry, and a headless demo locally. Estimation and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implemented constant-velocity propagation. M1.8 and M1.9 added deterministic scenario execution, truth telemetry, and a headless demo. M2.1 adds validated sensor measurement contracts. Estimation and autonomy remain planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -85,7 +85,7 @@ Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal 
 
 ## M1 — Mathematical & Simulation Foundations
 
-**Status:** In Progress (M1.1–M1.7 done, M1.8–M1.9 pending technical review, hosted CI, and merge)
+**Status:** Complete
 
 **Objective:** Establish reliable mathematical contracts and a minimal standalone simulation basis.
 
@@ -263,7 +263,7 @@ timestamp with constant world linear velocity and body angular velocity. See the
 
 ### Step M1.8 — Deterministic Scenario and Truth Telemetry
 
-**Status:** Implemented locally, pending technical review.
+**Status:** DONE. Merged in [PR #12](https://github.com/msake592/aerotwin/pull/12) at `d22d53d`.
 
 The runner records the initial snapshot and one validated snapshot per clock step.
 See the [scenario and telemetry contract](../architecture/scenario-telemetry.md).
@@ -271,14 +271,16 @@ The phase gate passed 83/83 Debug and 83/83 Release tests before demo developmen
 
 ### Step M1.9 — End-to-End Deterministic 3D Motion Demo
 
-**Status:** Implemented locally, pending technical review.
+**Status:** DONE. Merged in [PR #12](https://github.com/msake592/aerotwin/pull/12) at `d22d53d`.
 
 The headless reference scenario was verified against independent analytical
 position and orientation results. See the [technical report](../reports/m1-deterministic-motion-report.md).
 
+All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.com/msake592/aerotwin/actions/runs/42411140548).
+
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** Not Started
+**Status:** In Progress (M2.1 pending technical review)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -287,6 +289,15 @@ position and orientation results. See the [technical report](../reports/m1-deter
 **Deliverables:** Sensor models, estimator, fusion tests, documented noise assumptions and baseline evaluation.
 
 **Definition of done:** Synthetic cases validate estimation and covariance behavior; seeded experiments report errors and failure cases without ground-truth leakage.
+
+### Step M2.1 — Sensor Architecture and Measurement Contracts
+
+**Status:** Implemented locally, pending technical review.
+
+Validated GPS and IMU measurements share acquisition metadata and use explicit
+ENU/FLU units and covariance. See the
+[measurement contract](../architecture/measurements.md) and
+[ADR 0010](../adr/0010-measurement-contracts.md).
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
