@@ -23,7 +23,8 @@ borrows truth at a supplied acquisition timestamp and returns an owned
 observation. The [IMU generator](imu-simulation.md) also requires timestamped
 reference-point acceleration. Estimator inputs carry observations independently
 of truth.
-Scheduling, delivery, and estimation remain planned.
+The [sampling pipeline](sensor-sampling.md) schedules GPS and IMU from exact-time
+snapshots and returns ordered observations. Delivery and estimation remain planned.
 
 ## Planned integration flow
 
