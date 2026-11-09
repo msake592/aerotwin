@@ -32,6 +32,7 @@ add_library(aerotwin_core STATIC
     src/sensors/GaussianNoise.cpp
     src/sensors/GpsSensor.cpp
     src/sensors/ImuSensor.cpp
+    src/sensors/SensorSamplingPipeline.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC

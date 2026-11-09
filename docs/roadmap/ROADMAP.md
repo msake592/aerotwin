@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.4 pending technical review)
+**Status:** In Progress (M2.5 pending hosted CI and merge)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -317,10 +317,18 @@ preserves acquisition time, sensor identity, and configured covariance. See the
 
 ### Step M2.4 — Deterministic IMU Sensor Simulation
 
-**Status:** Implemented locally, pending review.
+**Status:** Merged in [PR #16](https://github.com/msake592/aerotwin/pull/16) at `f2fc4c6`. All four [hosted checks](https://github.com/msake592/aerotwin/actions/runs/42522070318) passed.
 
 The IMU generates FLU specific force and angular velocity from timestamp-matched
 truth and ENU acceleration. See the [IMU contract](../architecture/imu-simulation.md).
+
+### Step M2.5 — Deterministic Sensor Sampling Pipeline
+
+**Status:** Implemented locally, pending hosted CI and merge.
+
+The pipeline samples GPS and IMU at integer-nanosecond boundaries from exact-time
+truth and returns ordered, owned measurement batches. See the
+[sampling contract](../architecture/sensor-sampling.md).
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
