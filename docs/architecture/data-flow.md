@@ -24,7 +24,9 @@ observation. The [IMU generator](imu-simulation.md) also requires timestamped
 reference-point acceleration. Estimator inputs carry observations independently
 of truth.
 The [sampling pipeline](sensor-sampling.md) schedules GPS and IMU from exact-time
-snapshots and returns ordered observations. Delivery and estimation remain planned.
+snapshots and returns ordered observations. The [estimator state contract](state-estimation-foundations.md) defines an
+independently initialized ENU estimate and covariance. Delivery, prediction,
+and measurement updates remain planned.
 
 ## Planned integration flow
 
