@@ -13,7 +13,7 @@ package is a scaffold. The table also describes planned module responsibilities.
 | `core/.../simulation` | Simulation clock, vehicle ground truth, kinematic propagation, and in-memory scenario execution | Future sensor models may derive measurements from truth. Estimators receive measurements through separate contracts. |
 | `core/.../telemetry` | Versioned truth CSV and run metadata export | File I/O consumes completed scenario results |
 | `core/.../sensors` | Validated GPS and IMU contracts, generation interface, [deterministic noise](gaussian-noise.md), [GPS generation](gps-simulation.md), [IMU generation](imu-simulation.md), and [sampling](sensor-sampling.md) | Measurement headers are independent of truth state. Sensor models may borrow truth explicitly. |
-| `core/.../estimation` | [Validated estimator state](state-estimation-foundations.md) and [Kalman prediction](kalman-prediction.md) | Uses simulation timestamps and stays independent of simulator truth and PX4 estimation |
+| `core/.../estimation` | [Validated estimator state](state-estimation-foundations.md) with [Kalman prediction](kalman-prediction.md) and [GPS correction](gps-measurement-update.md) | Uses simulation timestamps and stays independent of simulator truth and PX4 estimation |
 | `core/.../autonomy` | Decisions and navigation | Consume estimates through explicit interfaces |
 | `core/.../validation` | Metrics and comparison logic | Truth available for evaluation, not implicit estimator input |
 | `simulation/` | Worlds, models, scenarios, configuration, launch assets | Simulator-specific content stays outside core |

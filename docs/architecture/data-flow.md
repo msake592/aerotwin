@@ -26,8 +26,8 @@ of truth.
 The [sampling pipeline](sensor-sampling.md) schedules GPS and IMU from exact-time
 snapshots and returns ordered observations. The [estimator state contract](state-estimation-foundations.md) defines an
 independently initialized ENU estimate and covariance. [Kalman prediction](kalman-prediction.md)
-advances that estimate to a later simulation timestamp. Delivery and measurement
-updates remain planned.
+advances that estimate to a later simulation timestamp. [GPS correction](gps-measurement-update.md)
+uses an observation from the same instant. Delivery and automatic sequencing remain planned.
 
 ## Planned integration flow
 

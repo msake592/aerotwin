@@ -35,6 +35,7 @@ add_library(aerotwin_core STATIC
     src/sensors/SensorSamplingPipeline.cpp
     src/estimation/EstimatorState.cpp
     src/estimation/KalmanPredictor.cpp
+    src/estimation/GpsKalmanUpdater.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC
