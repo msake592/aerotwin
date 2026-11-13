@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.6 pending independent review)
+**Status:** In Progress (M2.7 pending independent review)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -332,11 +332,19 @@ truth and returns ordered, owned measurement batches. See the
 
 ### Step M2.6 — State Estimation Foundations
 
-**Status:** Implemented locally, pending independent review.
+**Status:** Merged in [PR #18](https://github.com/msake592/aerotwin/pull/18) at `343a809`. All four [hosted checks](https://github.com/msake592/aerotwin/actions/runs/42669682825) passed.
 
 The [estimator state contract](../architecture/state-estimation-foundations.md)
 defines validated ENU position and velocity, their covariance, and initialization
-at an exact simulation timestamp. Prediction and updates remain planned.
+at an exact simulation timestamp.
+
+### Step M2.7 — Kalman Prediction
+
+**Status:** Implemented locally, pending independent review.
+
+[Kalman prediction](../architecture/kalman-prediction.md) advances an ENU estimate
+with a constant-velocity model and propagates covariance with white-acceleration
+process noise. Measurement correction remains planned.
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
