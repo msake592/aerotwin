@@ -52,13 +52,13 @@ replacing the current value is the reinitialization contract. A future
 estimator must reject ordinary operations from incompatible epochs and
 require explicit reinitialization on an epoch change.
 
-A future prediction must advance elapsed time strictly within the active
-epoch. A future GPS correction at the current estimate instant requires an
+[Kalman prediction](kalman-prediction.md) advances elapsed time strictly within
+the active epoch. A future GPS correction at the current estimate instant requires an
 exact timestamp match. Handling delayed measurements belongs to a later
-contract. The snapshot has no internal clock, time advancement, mutable
-estimator lifecycle, or uninitialized read operation. Epoch mismatch errors
-belong to the future operations that compare two timestamps.
+contract. The snapshot itself has no internal clock, time advancement, mutable
+estimator lifecycle, or uninitialized read operation. M2.7 prediction already
+returns an epoch mismatch error when the target epoch differs. M2.8 measurement
+correction remains future work.
 
-Prediction and measurement-update APIs are deferred until the process and
-observation models are selected. M2.6 provides no filtering, fusion, process
-noise propagation, or estimator evaluation.
+Measurement-update APIs remain deferred until the observation models are
+selected. M2.6 provides the snapshot contract used by prediction.

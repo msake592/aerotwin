@@ -34,6 +34,7 @@ add_executable(aerotwin_core_tests
     unit/ImuSensorTest.cpp
     unit/SensorSamplingPipelineTest.cpp
     unit/EstimatorStateTest.cpp
+    unit/KalmanPredictorTest.cpp
     integration/MotionPipelineTest.cpp
 )
 target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)
