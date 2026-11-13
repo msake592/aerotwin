@@ -48,7 +48,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
-| M2 | Sensor Simulation & State Estimation | In Progress (M2.7 pending independent review) |
+| M2 | Sensor Simulation & State Estimation | In Progress (M2.8 pending independent review) |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
@@ -146,8 +146,9 @@ frame, timestamp, and ownership rules. M2.2 adds
 [deterministic IMU generation](docs/architecture/imu-simulation.md). M2.5 adds
 [deterministic sensor sampling](docs/architecture/sensor-sampling.md). M2.6 adds
 [validated estimator state](docs/architecture/state-estimation-foundations.md)
-and M2.7 adds [Kalman prediction](docs/architecture/kalman-prediction.md),
-pending independent review.
+and M2.7 adds [Kalman prediction](docs/architecture/kalman-prediction.md).
+M2.8 adds [GPS measurement correction](docs/architecture/gps-measurement-update.md)
+and is pending independent review.
 
 ### Unit tests
 
