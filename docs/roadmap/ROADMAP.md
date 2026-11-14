@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.10 end-to-end fusion demo)
+**Status:** Complete for the GPS-aided baseline. See the [M2 acceptance audit](../reports/m3-integration-readiness.md#m2-acceptance-audit).
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -364,16 +364,17 @@ before GPS correction. The [deterministic integration fixture](../architecture/e
 
 ### Step M2.10 — End-to-End Fusion Demo
 
-**Status:** In Progress.
+**Status:** Complete. [PR #22](https://github.com/msake592/aerotwin/pull/22) merged at `56ebbfa`. The [four hosted checks](https://github.com/msake592/aerotwin/actions/runs/43624720282) passed. IMU is diagnostic only.
 
 - M2.10.1 architecture review is complete.
-- M2.10.2 [scenario and sensor acquisition](../architecture/fusion-demo-acquisition.md) is implemented locally.
-- M2.10.3 [estimation and metrics integration](../architecture/fusion-demo-acquisition.md#estimation-and-evaluation) is implemented locally.
-- M2.10.4 [executable and CSV reporting](../architecture/fusion-demo-acquisition.md#csv-v1-report) is in progress with a local implementation.
+- M2.10.2 [scenario and sensor acquisition](../architecture/fusion-demo-acquisition.md) was implemented and reviewed.
+- M2.10.3 [estimation and metrics integration](../architecture/fusion-demo-acquisition.md#estimation-and-evaluation) was implemented and reviewed.
+- M2.10.4 [executable and CSV reporting](../architecture/fusion-demo-acquisition.md#csv-v1-report) was implemented and reviewed.
+- M2.10.5 reviewed the integrated demo. M2.10.6 resolved both minor findings and published PR #22.
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
-**Status:** Not Started
+**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) is under review. M3.2 host validation is conditional on a suitable Ubuntu environment.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
 
