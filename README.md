@@ -48,8 +48,8 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
-| M2 | Sensor Simulation & State Estimation | In Progress (M2.10 end-to-end fusion demo) |
-| M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
+| M2 | Sensor Simulation & State Estimation | Complete (GPS-aided baseline) |
+| M3 | Gazebo, PX4 & ROS 2 Integration | In Progress (M3.1 readiness) |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
 | M6 | Explainable 3D Visualization | Not Started |
@@ -167,6 +167,12 @@ and floating-point environment produce byte-identical reports on replay.
 Acquisition and evaluation failures return a nonzero exit code and print
 diagnostics to stderr with empty stdout. See the
 [fusion demo architecture and CSV schema](docs/architecture/fusion-demo-acquisition.md#csv-v1-report).
+
+### Robotics integration readiness
+
+M3.1 provides read-only preflight and opt-in runtime checks. See the
+[environment validation guide](docs/guides/m3-environment.md) and
+[readiness report](docs/reports/m3-integration-readiness.md).
 
 ### Unit tests
 
