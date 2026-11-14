@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.8 pending independent review)
+**Status:** In Progress (M2.9 estimation evaluation)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -348,10 +348,19 @@ process noise.
 
 ### Step M2.8 — GPS Measurement Update
 
-**Status:** Implemented locally, pending independent review.
+**Status:** Merged in [PR #20](https://github.com/msake592/aerotwin/pull/20) at `f0d4d8c`. All four [hosted checks](https://github.com/msake592/aerotwin/actions/runs/43441694554) passed.
 
 [GPS correction](../architecture/gps-measurement-update.md) updates the ENU
 estimate from an observation acquired at the same simulation timestamp.
+
+### Step M2.9 — Estimation Evaluation
+
+**Status:** In Progress. RMSE, NEES, GPS NIS, and the M2.9.5 deterministic scenarios are implemented locally.
+
+[Estimation RMSE](../architecture/estimation-rmse.md) compares aligned ENU
+position and velocity snapshots. NEES evaluates the aligned error against
+the estimate covariance. GPS NIS scores the innovation against its covariance
+before GPS correction. The [deterministic integration fixture](../architecture/estimation-rmse.md#deterministic-integration-scenario) verifies prediction, correction, and metric selection at two GPS acquisitions.
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 

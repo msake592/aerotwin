@@ -36,6 +36,7 @@ add_library(aerotwin_core STATIC
     src/estimation/EstimatorState.cpp
     src/estimation/KalmanPredictor.cpp
     src/estimation/GpsKalmanUpdater.cpp
+    src/validation/EstimationMetrics.cpp
 )
 
 target_include_directories(aerotwin_core PUBLIC
