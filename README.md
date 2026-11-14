@@ -48,7 +48,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
-| M2 | Sensor Simulation & State Estimation | In Progress (M2.9 estimation evaluation) |
+| M2 | Sensor Simulation & State Estimation | In Progress (M2.10 end-to-end fusion demo) |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
@@ -148,8 +148,25 @@ frame, timestamp, and ownership rules. M2.2 adds
 [validated estimator state](docs/architecture/state-estimation-foundations.md)
 and M2.7 adds [Kalman prediction](docs/architecture/kalman-prediction.md).
 M2.8 adds [GPS measurement correction](docs/architecture/gps-measurement-update.md)
-and is merged. M2.9 evaluation is in progress with
-[estimation RMSE](docs/architecture/estimation-rmse.md) implemented locally.
+and is merged. M2.9 [estimation evaluation](docs/architecture/estimation-rmse.md) is merged.
+### Headless fusion demo
+
+Run the deterministic GPS-aided constant-velocity estimator and redirect its
+CSV v1 report to a file:
+
+```sh
+cmake --preset dev-debug
+cmake --build --preset dev-debug --target aerotwin_fusion_demo
+build/dev-debug/examples/fusion_demo/aerotwin_fusion_demo > fusion.csv
+```
+
+The demo takes no arguments and also builds with `-DBUILD_TESTING=OFF`.
+Its report contains configuration, GPS evaluation, IMU diagnostics, and
+summary records. IMU measurements are diagnostic only. The same executable
+and floating-point environment produce byte-identical reports on replay.
+Acquisition and evaluation failures return a nonzero exit code and print
+diagnostics to stderr with empty stdout. See the
+[fusion demo architecture and CSV schema](docs/architecture/fusion-demo-acquisition.md#csv-v1-report).
 
 ### Unit tests
 

@@ -38,9 +38,12 @@ add_executable(aerotwin_core_tests
     unit/GpsKalmanUpdaterTest.cpp
     unit/EstimationMetricsTest.cpp
     integration/EstimationEvaluationTest.cpp
+    integration/FusionAcquisitionTest.cpp
+    integration/FusionEvaluationTest.cpp
+    integration/FusionReportTest.cpp
     integration/MotionPipelineTest.cpp
 )
-target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)
+target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_fusion_acquisition GTest::gtest_main)
 target_compile_options(aerotwin_core_tests PRIVATE
     $<$<CXX_COMPILER_ID:Clang,AppleClang,GNU>:-Wall;-Wextra;-Wpedantic>
     $<$<CXX_COMPILER_ID:MSVC>:/W4>

@@ -280,7 +280,7 @@ All four M1.8/M1.9 hosted CI jobs passed in [CI run 42411140548](https://github.
 
 ## M2 — Sensor Simulation & State Estimation
 
-**Status:** In Progress (M2.9 estimation evaluation)
+**Status:** In Progress (M2.10 end-to-end fusion demo)
 
 **Objective:** Estimate single-drone state with explicit uncertainty.
 
@@ -355,12 +355,21 @@ estimate from an observation acquired at the same simulation timestamp.
 
 ### Step M2.9 — Estimation Evaluation
 
-**Status:** In Progress. RMSE, NEES, GPS NIS, and the M2.9.5 deterministic scenarios are implemented locally.
+**Status:** Complete. Merged in [PR #21](https://github.com/msake592/aerotwin/pull/21) at `bafc3bd`. All four [hosted checks](https://github.com/msake592/aerotwin/actions/runs/43603796796) passed.
 
 [Estimation RMSE](../architecture/estimation-rmse.md) compares aligned ENU
 position and velocity snapshots. NEES evaluates the aligned error against
 the estimate covariance. GPS NIS scores the innovation against its covariance
 before GPS correction. The [deterministic integration fixture](../architecture/estimation-rmse.md#deterministic-integration-scenario) verifies prediction, correction, and metric selection at two GPS acquisitions.
+
+### Step M2.10 — End-to-End Fusion Demo
+
+**Status:** In Progress.
+
+- M2.10.1 architecture review is complete.
+- M2.10.2 [scenario and sensor acquisition](../architecture/fusion-demo-acquisition.md) is implemented locally.
+- M2.10.3 [estimation and metrics integration](../architecture/fusion-demo-acquisition.md#estimation-and-evaluation) is implemented locally.
+- M2.10.4 [executable and CSV reporting](../architecture/fusion-demo-acquisition.md#csv-v1-report) is in progress with a local implementation.
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
