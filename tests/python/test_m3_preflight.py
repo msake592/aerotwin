@@ -41,19 +41,23 @@ def test_cleanup_kills_members_after_leader_exits(monkeypatch):
 
     class Process:
         pid = 42
+        attempts = 0
 
         def wait(self, timeout=None):
             calls.append(("wait", timeout))
-            if timeout:
+            self.attempts += 1
+            if self.attempts == 1:
                 raise subprocess.TimeoutExpired("simulator", timeout)
 
+    moments = iter((0.0, 1.0))
+    monkeypatch.setattr(preflight.time, "monotonic", lambda: next(moments))
     monkeypatch.setattr(preflight.os, "killpg", lambda pid, signum: calls.append((pid, signum)))
-    preflight.stop_group(Process())
+    assert preflight.stop_group(Process())
     assert calls == [
         (42, preflight.signal.SIGTERM),
         ("wait", 1),
         (42, preflight.signal.SIGKILL),
-        ("wait", None),
+        ("wait", 1),
     ]
 
 

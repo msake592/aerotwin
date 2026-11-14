@@ -69,3 +69,6 @@ does not validate clocks or simulation provenance.
 Each command runs in a private POSIX process group with bounded waits
 and group cleanup. Missing checks are explicit. Unit tests require
 no robotics software. Successful mocks do not establish runtime readiness.
+
+For the pinned setup and two-run x500/odometry acceptance procedure, see the
+[M3.2 runtime guide](m3-sitl-runtime.md).

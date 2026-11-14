@@ -374,7 +374,7 @@ before GPS correction. The [deterministic integration fixture](../architecture/e
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
-**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) is under review. M3.2 host validation is conditional on a suitable Ubuntu environment.
+**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) merged in PR #23. [M3.2 runtime tooling](../guides/m3-sitl-runtime.md) is in progress. Live validation requires an isolated Ubuntu 24.04 amd64 host.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
 
