@@ -10,6 +10,7 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import time
 import uuid
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -31,21 +32,30 @@ class Check:
     command: tuple[str, ...] = ()
 
 
-def stop_group(process: subprocess.Popen[bytes]) -> None:
+def stop_group(process: subprocess.Popen[bytes], *, grace: int = 1) -> bool:
+    deadline = time.monotonic() + grace
     try:
         os.killpg(process.pid, signal.SIGTERM)
     except ProcessLookupError:
-        return
+        process.wait(timeout=grace)
+        return False
     try:
-        process.wait(timeout=1)
+        process.wait(timeout=grace)
     except subprocess.TimeoutExpired:
         pass
-    # The leader may have exited while its children are still running.
+    # The leader may exit before Gazebo or another child has drained.
+    while time.monotonic() < deadline:
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            return False
+        time.sleep(0.05)
     try:
         os.killpg(process.pid, signal.SIGKILL)
     except ProcessLookupError:
-        pass
-    process.wait()
+        return False
+    process.wait(timeout=grace)
+    return True
 
 
 def probe(
@@ -54,6 +64,7 @@ def probe(
     timeout: int = 5,
     cwd: Path | None = None,
     env: dict[str, str] | None = None,
+    output_limit: int = 16_384,
 ) -> Check:
     executable = shutil.which(command[0])
     if executable is None:
@@ -78,16 +89,18 @@ def probe(
                 finally:
                     stop_group(process)
             log.seek(0, os.SEEK_END)
-            truncated = log.tell() > 16_384
-            log.seek(max(0, log.tell() - 16_384))
+            truncated = log.tell() > output_limit
+            log.seek(max(0, log.tell() - output_limit))
             output = log.read().decode(errors="replace").strip()
-    except OSError as error:
+    except (OSError, subprocess.TimeoutExpired) as error:
         return Check(name, "FAIL", str(error), command)
     if code is None:
         detail = f"Timed out after {timeout}s"
         return Check(name, "FAIL", f"{detail}: {output}" if output else detail, command)
     if truncated:
-        return Check(name, "FAIL", "Command output exceeded 16384 bytes; tail: " + output, command)
+        return Check(
+            name, "FAIL", f"Command output exceeded {output_limit} bytes; tail: " + output, command
+        )
     if code:
         return Check(name, "FAIL", f"Exit {code}" + (f": {output}" if output else ""), command)
     return Check(name, "PASS", output or "Exited successfully", command)
