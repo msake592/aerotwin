@@ -15,7 +15,7 @@ package is a scaffold. The table also describes planned module responsibilities.
 | `core/.../sensors` | Validated GPS and IMU contracts, generation interface, [deterministic noise](gaussian-noise.md), [GPS generation](gps-simulation.md), [IMU generation](imu-simulation.md), and [sampling](sensor-sampling.md) | Measurement headers are independent of truth state. Sensor models may borrow truth explicitly. |
 | `core/.../estimation` | [Validated estimator state](state-estimation-foundations.md) with [Kalman prediction](kalman-prediction.md) and [GPS correction](gps-measurement-update.md) | Uses simulation timestamps and stays independent of simulator truth and PX4 estimation |
 | `core/.../autonomy` | Decisions and navigation | Consume estimates through explicit interfaces |
-| `core/.../validation` | Metrics and comparison logic | Truth available for evaluation, not implicit estimator input |
+| `core/.../validation` | [Estimation RMSE](estimation-rmse.md) and comparison logic | Truth available for evaluation, not implicit estimator input |
 | `simulation/` | Worlds, models, scenarios, configuration, launch assets | Simulator-specific content stays outside core |
 | `ros2_ws/src/` | ROS 2 adapters and integration | Translate messages at the boundary |
 | `experiments/` | Python orchestration, configuration, analysis | Record seeds, versions, and run metadata |

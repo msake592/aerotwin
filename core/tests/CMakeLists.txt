@@ -36,6 +36,8 @@ add_executable(aerotwin_core_tests
     unit/EstimatorStateTest.cpp
     unit/KalmanPredictorTest.cpp
     unit/GpsKalmanUpdaterTest.cpp
+    unit/EstimationMetricsTest.cpp
+    integration/EstimationEvaluationTest.cpp
     integration/MotionPipelineTest.cpp
 )
 target_link_libraries(aerotwin_core_tests PRIVATE aerotwin_core GTest::gtest_main)

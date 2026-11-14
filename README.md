@@ -48,7 +48,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | --- | --- | --- |
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
-| M2 | Sensor Simulation & State Estimation | In Progress (M2.8 pending independent review) |
+| M2 | Sensor Simulation & State Estimation | In Progress (M2.9 estimation evaluation) |
 | M3 | Gazebo, PX4 & ROS 2 Integration | Not Started |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
@@ -148,7 +148,8 @@ frame, timestamp, and ownership rules. M2.2 adds
 [validated estimator state](docs/architecture/state-estimation-foundations.md)
 and M2.7 adds [Kalman prediction](docs/architecture/kalman-prediction.md).
 M2.8 adds [GPS measurement correction](docs/architecture/gps-measurement-update.md)
-and is pending independent review.
+and is merged. M2.9 evaluation is in progress with
+[estimation RMSE](docs/architecture/estimation-rmse.md) implemented locally.
 
 ### Unit tests
 
