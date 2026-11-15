@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -171,6 +172,20 @@ def test_odometry_requires_three_ordered_valid_samples():
     assert not sample(4, position=[0, float("nan"), 2])["valid"]
     assert not sample(4, pose_frame=0)["valid"]
     assert not sample(4, timestamp_sample=5)["valid"]
+
+
+def test_odometry_report_serializes_non_builtin_numeric_scalars():
+    observation = sample(
+        2,
+        position=[Decimal("0.25")] * 3,
+        velocity=[Decimal("0.5")] * 3,
+        q=[Decimal(1), Decimal(0), Decimal(0), Decimal(0)],
+    )
+    report = json.loads(json.dumps(observation, allow_nan=False))
+    assert report["valid"]
+    assert report["position_m"] == [0.25] * 3
+    assert report["velocity_mps"] == [0.5] * 3
+    assert report["attitude_wxyz"] == [1.0, 0.0, 0.0, 0.0]
 
 
 def test_probe_timeout_remains_a_failure():

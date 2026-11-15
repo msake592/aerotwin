@@ -185,4 +185,65 @@ Gazebo startup and clock progression, both x500 repetitions, XRCE exchange,
 ROS message decoding, and live cleanup are **BLOCKED** by the absent Ubuntu
 runtime. Standalone-world pause/reset and cross-domain clock observations
 were **NOT RUN**. Process cleanup was exercised with local test subprocesses.
-No Ubuntu package versions have been resolved or accepted yet.
+No Ubuntu AMD64 reference package versions have been resolved or accepted yet.
+
+## M3.2.2 Docker ARM64 results
+
+Docker Desktop on Apple Silicon ran two unarmed, headless x500 sessions with
+PX4 Release 1.17.0 at `d6f12ad1c4f70ad3230afd7d86e971421e02fef4`.
+Both used Ubuntu 24.04.4 ARM64, Gazebo 8.15.0, ROS Jazzy
+(`ros-jazzy-ros-base` 0.11.0), the Agent v2.4.3 source pin, and the
+`px4_msgs` pin listed above. The three checked message files matched the
+firmware byte for byte. This run used the existing container based on
+`px4io/px4-sitl-gazebo@sha256:29a5a1b5af77e5d39b67bc6664d36acead63f9dfb829475216522b1feec8036e`
+for its Harmonic libraries. The packaged PX4 executable was bypassed.
+
+To reproduce the source build inside an authorized ARM64 Docker workspace,
+limit the container to two CPUs and 6 GiB of memory. Install the following
+build packages inside the container, then use the pinned source and build
+commands in this guide with `-j2` and `--parallel 2`. Install PX4's
+`Tools/setup/requirements.txt` in a Python 3.12 virtual environment before
+configuring PX4.
+
+```sh
+apt-get update
+apt-get install --no-install-recommends git build-essential ninja-build cmake \
+  python3-venv python3-dev python3-pip libssl-dev libxml2-dev libxml2-utils \
+  pkg-config ca-certificates curl zip unzip libopencv-dev cppzmq-dev
+```
+
+Set `GZ_SIM_RESOURCE_PATH` and `GZ_SIM_SYSTEM_PLUGIN_PATH` from the pinned
+source and build before starting Gazebo. The base image's inherited resource
+paths can otherwise take precedence over the pinned assets. Start `gz sim
+-r -s` with the pinned default world in a separately managed process, set
+`PX4_GZ_STANDALONE=1`, `PX4_GZ_WORLD=default`, and
+`PX4_GZ_MODELS` to the pinned models path, then run the newly built PX4
+binary with `HEADLESS=1` and `PX4_SIM_MODEL=gz_x500`.
+
+The validated topology ran the Agent and Jazzy subscriber in the same
+container as PX4, with DDS discovery restricted to localhost, UDP port
+18888, and ROS domain 55. Before starting PX4, set
+`PX4_UXRCE_DDS_PORT=18888` and `ROS_DOMAIN_ID=55` and export a fresh
+`PX4_UXRCE_DDS_NS`. Start the built Agent with
+`MicroXRCEAgent udp4 -p 18888 -v 4` using its private Fast DDS libraries.
+From the same container, source Jazzy and the overlay. With
+`ROS_DOMAIN_ID=55`, `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`, and the
+experiment package importable by Jazzy's Python, run the probe.
+
+```sh
+python3 -m aerotwin_experiments.m3_odometry_probe \
+  "/$PX4_UXRCE_DDS_NS/fmu/out/vehicle_odometry"
+```
+
+Both sessions connected and decoded three valid ordered
+estimates from one publisher. PX4 and Gazebo exited with code 0 and the
+Agent stopped with SIGTERM. The synced DDS timestamps were epoch-scale,
+while PX4 sensor logs remained simulation-relative. The retained ULogs
+showed no duplicate or backward sample times in the recorded gyro,
+accelerometer, or vehicle IMU streams.
+
+Standalone Gazebo time-only reset moved time backward and resumed the
+world in repeated ARM64 probes. That behavior fails the existing clock
+gate, which requires the reset to preserve pause. Cross-domain clock mapping,
+coupled reset, separate-container transport, and the Ubuntu AMD64 reference
+remain unverified.
