@@ -7,9 +7,10 @@ import time
 
 
 def odometry_sample(message) -> dict:
-    position = list(message.position)
-    velocity = list(message.velocity)
-    attitude = list(message.q)
+    # ROS fixed-size float arrays can expose NumPy scalars, which JSON cannot encode.
+    position = [float(value) for value in message.position]
+    velocity = [float(value) for value in message.velocity]
+    attitude = [float(value) for value in message.q]
     valid = (
         message.pose_frame in (1, 2)
         and message.velocity_frame in (1, 2, 3)

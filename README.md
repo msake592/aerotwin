@@ -49,7 +49,7 @@ M0 — Project Foundation is **Complete**. Steps 0.1–0.3 establish directory s
 | M0 | Project Foundation | Complete |
 | M1 | Mathematical & Simulation Foundations | Complete |
 | M2 | Sensor Simulation & State Estimation | Complete (GPS-aided baseline) |
-| M3 | Gazebo, PX4 & ROS 2 Integration | In Progress (M3.1 readiness) |
+| M3 | Gazebo, PX4 & ROS 2 Integration | In Progress (Docker ARM64 odometry observed) |
 | M4 | Uncertainty-Aware Autonomous Navigation | Not Started |
 | M5 | Validation & Robustness Benchmarking | Not Started |
 | M6 | Explainable 3D Visualization | Not Started |

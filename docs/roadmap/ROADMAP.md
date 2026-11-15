@@ -374,7 +374,7 @@ before GPS correction. The [deterministic integration fixture](../architecture/e
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
-**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) merged in PR #23. [M3.2 runtime tooling](../guides/m3-sitl-runtime.md) is in progress. Live validation requires an isolated Ubuntu 24.04 amd64 host.
+**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) merged in PR #23. [M3.2 runtime tooling](../guides/m3-sitl-runtime.md) merged in PR #24. Two [Docker ARM64 sessions](../guides/m3-sitl-runtime.md#m322-docker-arm64-results) demonstrated decoded odometry over DDS on one container. Clock mapping and the isolated Ubuntu 24.04 amd64 reference remain unverified.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
 
