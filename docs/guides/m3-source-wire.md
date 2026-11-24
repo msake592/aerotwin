@@ -112,7 +112,7 @@ reconnection continuity remain blocked.
 
 ## Regression verification
 
-The local suite passed 99 pytest cases, including ten focused payload-identity
+The local suite passed 100 pytest cases, including eleven focused payload-identity
 tests. Debug and Release each passed 230 CTest cases. Ruff lint/format,
 dependency checks, expanded Compose configuration and whitespace checks passed.
 The CI tests use synthetic payloads. The numerical offset measurements above

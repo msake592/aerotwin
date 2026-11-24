@@ -94,3 +94,36 @@ def test_summary_retains_integer_epoch_offsets():
     assert report["acquisition"]["median_ns"] == expected
     assert report["publication_acquisition_offset_difference_ns"] == [0]
     assert report["arrival_ordering_violations"] == 0
+
+
+def test_ulog_nonfinite_fields_remain_rejectable_json(monkeypatch):
+    import json
+    import sys
+    from types import SimpleNamespace
+
+    from aerotwin_experiments.m3_source_wire import ulog_rows
+
+    data = {
+        name: [value]
+        for name, value in {
+            "timestamp": 10,
+            "timestamp_sample": 9,
+            "pose_frame": 1,
+            "velocity_frame": 1,
+            "reset_counter": 0,
+        }.items()
+    }
+    for field, size in (("position", 3), ("velocity", 3), ("q", 4)):
+        for index in range(size):
+            data[f"{field}[{index}]"] = [1.0 if field == "q" and index == 0 else 0.0]
+    data["position[0]"] = [float("nan")]
+    dataset = SimpleNamespace(name="vehicle_odometry", multi_id=0, data=data)
+    monkeypatch.setitem(
+        sys.modules,
+        "pyulog",
+        SimpleNamespace(ULog=lambda *args: SimpleNamespace(data_list=[dataset], dropouts=[])),
+    )
+    rows = ulog_rows("synthetic.ulg")
+    json.dumps(rows, allow_nan=False)
+    assert rows[0]["position_m"][0] is None
+    assert match(rows, [row()])["invalid"] == 1

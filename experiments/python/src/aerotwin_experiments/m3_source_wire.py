@@ -107,7 +107,8 @@ def ulog_rows(path, metadata=None):
                 ("velocity_mps", "velocity", 3),
                 ("attitude_wxyz", "q", 4),
             ):
-                row[output] = [float(data[f"{field}[{n}]"][index]) for n in range(length)]
+                values = [float(data[f"{field}[{n}]"][index]) for n in range(length)]
+                row[output] = [value if math.isfinite(value) else None for value in values]
             rows.append(row)
     if metadata is not None:
         intervals = [b["timestamp_us"] - a["timestamp_us"] for a, b in zip(rows, rows[1:])]
