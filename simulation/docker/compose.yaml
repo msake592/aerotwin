@@ -17,6 +17,7 @@ x-runtime: &runtime
     PYTHONDONTWRITEBYTECODE: "1"
     AEROTWIN_RUN: ${AEROTWIN_RUN:?Set a unique run ID}
     GZ_PARTITION: ${AEROTWIN_RUN}
+    AEROTWIN_SOURCE_CAPTURE: ${AEROTWIN_SOURCE_CAPTURE:-0}
   volumes:
     - ${AEROTWIN_PYTHON_SOURCE:?Set Python source path}:/aerotwin:ro
     - ${AEROTWIN_EVIDENCE:?Set an external evidence directory}:/evidence
