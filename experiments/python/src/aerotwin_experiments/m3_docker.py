@@ -245,7 +245,7 @@ class Session:
             "last_samples": observed[-3:],
         }
 
-    def run(self):
+    def run(self, clock_experiments=True):
         result = {
             "identity": self.identity,
             "transport": "NOT_RUN",
@@ -292,15 +292,16 @@ class Session:
                 raise RuntimeError("No three consecutive valid ordered decoded messages")
             result["transport"] = "PASS"
             result["accepted_samples"] = valid
-            self.control("pause: true")
-            result["clocks"]["pause"] = self.phase("pause", 4)
-            self.control("pause: false")
-            result["clocks"]["resume"] = self.phase("resume", 4)
-            self.control("pause: true")
-            result["before_reset"] = self.snapshot("before-reset")
-            self.control("reset: {time_only: true}")
-            # Source telemetry can stall after rollback. Each probe remains bounded.
-            result["clocks"]["time_only_reset"] = self.phase("reset", 4)
+            if clock_experiments:
+                self.control("pause: true")
+                result["clocks"]["pause"] = self.phase("pause", 4)
+                self.control("pause: false")
+                result["clocks"]["resume"] = self.phase("resume", 4)
+                self.control("pause: true")
+                result["before_reset"] = self.snapshot("before-reset")
+                self.control("reset: {time_only: true}")
+                # Source telemetry can stall after rollback. Each probe remains bounded.
+                result["clocks"]["time_only_reset"] = self.phase("reset", 4)
         except KeyboardInterrupt:
             result["error"] = "Interrupted; owned service cleanup requested"
             result["interrupted"] = True

@@ -5,7 +5,7 @@
 | M0 — Project Foundation | Structure, build/test/CI, and architecture review | None | Complete |
 | M1 — Mathematical & Simulation Foundations | Contracts, tested mathematics, minimal deterministic simulation | M0 | Complete |
 | M2 — Sensor Simulation & State Estimation | Sensor models, custom estimator, uncertainty evaluation | M1 | Complete (seeded GPS-aided baseline, diagnostic IMU) |
-| M3 — Gazebo, PX4 & ROS 2 Integration | Validated stack and adapters | M1, M2 | In Progress (multi-container ARM64 DDS validated, clock adapters blocked) |
+| M3 — Gazebo, PX4 & ROS 2 Integration | Validated stack and adapters | M1, M2 | In Progress (multi-container ARM64 DDS validated, epoch validation implemented, clock adapters blocked) |
 | M4 — Uncertainty-Aware Autonomous Navigation | Navigation using estimates and uncertainty | M2, M3 | Not Started |
 | M5 — Validation & Robustness Benchmarking | Reproducible fault/disturbance benchmarks | M3, M4 | Not Started |
 | M6 — Explainable 3D Visualization | Time-aligned inspection and explanation | M3, M4, M5 | Not Started |
