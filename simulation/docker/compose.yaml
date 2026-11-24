@@ -1,0 +1,37 @@
+# Runtime snapshot must be provided by immutable local sha256 image ID.
+x-runtime: &runtime
+  image: ${AEROTWIN_RUNTIME_IMAGE:?Set the verified immutable image ID}
+  pull_policy: never
+  platform: linux/arm64
+  init: true
+  cpus: 2
+  mem_limit: 2g
+  stop_grace_period: 15s
+  entrypoint: ["/bin/bash", "-c"]
+  environment:
+    ROS_DOMAIN_ID: "55"
+    ROS_AUTOMATIC_DISCOVERY_RANGE: SUBNET
+    RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+    PYTHONPATH: /aerotwin
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    AEROTWIN_RUN: ${AEROTWIN_RUN:?Set a unique run ID}
+    GZ_PARTITION: ${AEROTWIN_RUN}
+  volumes:
+    - ${AEROTWIN_PYTHON_SOURCE:?Set Python source path}:/aerotwin:ro
+    - ${AEROTWIN_EVIDENCE:?Set an external evidence directory}:/evidence
+  networks: [robotics]
+services:
+  xrce-agent:
+    <<: *runtime
+    command: ["exec python3 -m aerotwin_experiments.m3_container agent"]
+  px4-sim:
+    <<: *runtime
+    command: ["exec python3 -m aerotwin_experiments.m3_container sim"]
+  ros-observer:
+    <<: *runtime
+    command:
+      - "source /opt/ros/jazzy/setup.bash && source /work/dds/ros-overlay/install/setup.bash && exec python3 -m aerotwin_experiments.m3_container observer"
+networks:
+  robotics:
+    internal: true

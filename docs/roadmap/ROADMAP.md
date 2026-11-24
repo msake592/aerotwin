@@ -374,7 +374,11 @@ before GPS correction. The [deterministic integration fixture](../architecture/e
 
 ## M3 — Gazebo, PX4 & ROS 2 Integration
 
-**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) merged in PR #23. [M3.2 runtime tooling](../guides/m3-sitl-runtime.md) merged in PR #24. Two [Docker ARM64 sessions](../guides/m3-sitl-runtime.md#m322-docker-arm64-results) demonstrated decoded odometry over DDS on one container. Clock mapping and the isolated Ubuntu 24.04 amd64 reference remain unverified.
+**Status:** In Progress. [M3.1 readiness](../reports/m3-integration-readiness.md) merged in PR #23. [M3.2 runtime tooling](../guides/m3-sitl-runtime.md) merged in PR #24. Two [Docker ARM64 sessions](../guides/m3-sitl-runtime.md#m322-docker-arm64-results) demonstrated decoded odometry over DDS on one container. [M3.3-B multi-container transport](../guides/m3-docker-transport.md) demonstrated
+two independent ARM64 DDS sessions with pause/resume observations. Gazebo-only
+time reset stalled PX4 telemetry in the observation window. M3.4 timestamp
+adapters remain blocked on clock mapping and reset policy evidence. The Ubuntu
+24.04 amd64 reference remains unverified.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
 

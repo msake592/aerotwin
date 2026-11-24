@@ -66,3 +66,14 @@ processes. Record exported topics, clock behavior across pause and reset,
 message definitions, QoS, and unresolved origin/covariance questions.
 This evidence gates production adapters. Armed flight and estimator changes
 are outside M3.2 host validation.
+
+## M3.3-B observed boundary
+
+The [multi-container experiment](../guides/m3-docker-transport.md) demonstrates
+typed odometry transport across an internal Docker network on ARM64. The
+pinned PX4 serializer adjusts acquisition and publication timestamps by the
+XRCE session offset. A pause freezes simulation and sensor time while the
+observer clock advances. After Gazebo-only time reset, stale PX4 sensor
+timestamps and absent new odometry block in-place epoch mapping in the
+observed window. Production timestamp adapters remain blocked pending
+per-message clock correlation and supported coupled reset semantics.
