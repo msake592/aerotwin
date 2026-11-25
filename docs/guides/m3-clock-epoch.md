@@ -136,3 +136,11 @@ ctest --preset dev-debug
 ctest --preset dev-release
 git diff --check
 ```
+
+## M3.3-D follow-up
+
+The [source-to-wire verification](m3-source-wire.md) subsequently configured
+runtime ULog capture and matched unique invariant payloads. Two independent
+sessions measured the serializer offsets. Absolute synchronization uncertainty
+and estimator timing tolerances remain unresolved, so production mapping
+initialization remains blocked.

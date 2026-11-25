@@ -155,6 +155,15 @@ def sim():
     env = sim_environment()
     directory = Path("/tmp/aerotwin-session")
     directory.mkdir()
+    if os.environ.get("AEROTWIN_SOURCE_CAPTURE") == "1":
+        import shutil
+
+        shutil.copytree(BUILD / "etc", directory / "etc")
+        logging = directory / "etc/logging"
+        logging.mkdir(parents=True)
+        (logging / "logger_topics.txt").write_text(
+            "vehicle_odometry 0\ntimesync_status 0\nsensor_combined 0\n"
+        )
     (directory / "gz_env.sh").symlink_to(BUILD / "rootfs/gz_env.sh")
     logs = {}
     try:

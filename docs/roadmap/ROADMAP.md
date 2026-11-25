@@ -379,7 +379,10 @@ two independent ARM64 DDS sessions with pause/resume observations. Gazebo-only
 time reset stalled PX4 telemetry in the observation window. M3.4 timestamp
 adapters remain blocked on clock mapping and reset policy evidence.
 [M3.3-C validation](../guides/m3-clock-epoch.md) adds tested epoch/generation
-invalidation and rejects unproven per-message correlation. The Ubuntu
+invalidation and rejects unproven per-message correlation.
+[M3.3-D](../guides/m3-source-wire.md) measured source-to-wire VehicleOdometry
+offsets through unique captured payloads. Absolute uncertainty and estimator
+timing tolerance still block M3.4. The Ubuntu
 24.04 amd64 reference remains unverified.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
