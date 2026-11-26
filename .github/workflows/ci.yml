@@ -36,6 +36,12 @@ jobs:
         run: cmake --build --preset dev-debug
       - name: Run CTest
         run: ctest --preset dev-debug
+      - name: Verify production-backed timing experiments
+        run: |
+          test -x build/dev-debug/examples/timing_sensitivity/aerotwin_timing_sensitivity
+          python3 -m venv "$RUNNER_TEMP/aerotwin-timing-tests"
+          "$RUNNER_TEMP/aerotwin-timing-tests/bin/python" -m pip install -e '.[dev]'
+          "$RUNNER_TEMP/aerotwin-timing-tests/bin/python" -m pytest tests/python/test_timing_sensitivity.py
 
   python:
     name: Python ${{ matrix.python-version }} (ubuntu-24.04)

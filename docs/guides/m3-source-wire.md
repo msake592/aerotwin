@@ -1,5 +1,10 @@
 # M3.3-D source-to-wire timestamp verification
 
+This guide preserves the M3.3-D checkpoint and its measured scope. The
+subsequent [M3.3-E release gate](../reports/m3-timing-release-gate.md) records
+prototype timing allocations and the current architecture decision. Production
+timestamp mapping remains BLOCKED.
+
 ## Capture and identity
 
 The retained default ULog inspected for this package contained no odometry
