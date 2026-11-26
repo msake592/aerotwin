@@ -407,12 +407,21 @@ The timing/motion values are approved for continued prototype experimentation
 only. Successful unit tests and timing sensitivity do not establish production
 mapping readiness. New live robotics experiments were excluded from E.4.
 
-**Next proposed package:** M3.3-F.1, source-time GPS qualification through the
-existing runtime no-adjustment mode (Option A). Explicitly approve configuration,
-coverage and any missing observation hook before execution. No new source/Gazebo
-bridge, firmware instrumentation or M3.4 adapter is authorized. Options B/C have
-bounded alternatives and stop conditions in the ADR. Detailed M3.5–M3.8 scopes
-remain to be approved; they are not newly implemented by this package.
+### M3.3-F.1 — Source-time GPS qualification
+
+**Package status:** [Protocol and offline qualification checks complete](../reports/m3-source-time-gps-qualification.md), overall GPS qualification **BLOCKED**.
+The approved Option A configuration and 30 Hz selected GPS path were inspected.
+The independent acquisition-event association gate was not established before
+launch, so zero of two allowed live attempts were used. No GPS timestamp or
+0.5 ms registration PASS is claimed. Epoch/stale-record checks pass only in
+deterministic scope. M3.4 remains BLOCKED.
+
+**Next proposed package:** M3.3-F.2, GPS acquisition observation-hook design and
+approval. Specify an atomic original Gazebo header / assigned HRT / post-noise
+GPS identity observation, then request explicit instrumentation approval. No
+firmware change, new source/Gazebo bridge or production adapter is authorized.
+Options B/C retain their ADR stop conditions. Detailed M3.5–M3.8 scopes remain
+to be approved; none is implemented by this package.
 
 ## M4 — Uncertainty-Aware Autonomous Navigation
 
