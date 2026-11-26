@@ -1,0 +1,2 @@
+add_executable(aerotwin_timing_sensitivity main.cpp)
+target_link_libraries(aerotwin_timing_sensitivity PRIVATE aerotwin_core)

@@ -13,3 +13,4 @@ add_subdirectory(examples/basic_core)
 add_subdirectory(examples/motion_demo)
 
 add_subdirectory(examples/fusion_demo)
+add_subdirectory(examples/timing_sensitivity)

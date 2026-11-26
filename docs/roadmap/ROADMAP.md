@@ -1,6 +1,6 @@
 # Development roadmap
 
-Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implemented constant-velocity propagation. M1.8 and M1.9 added deterministic scenario execution, truth telemetry, and a headless demo. M2.1 adds validated sensor measurement contracts. Estimation and autonomy remain planned. Milestone completion requires evidence against its definition of done.
+Steps 0.1–0.6 are implemented: repository foundation documentation, a minimal standalone C++20 build with a version-reporting example, optional GoogleTest/CTest unit testing, and the Python experiment package with pytest and Ruff. Step 0.7 adds verified GitHub Actions CI. Step 0.8 records the architecture review and M1 readiness. M1.5 implemented the deterministic simulation clock. M1.6 implemented the validated ground-truth vehicle state model. M1.7 implemented constant-velocity propagation. M1.8 and M1.9 added deterministic scenario execution, truth telemetry, and a headless demo. M2 completed the seeded GPS-aided constant-velocity estimator and diagnostic IMU fixture. M3 has experimental ARM64 transport and timing evidence, while production timestamp adapters remain blocked. Autonomy remains planned. Milestone completion requires evidence against its definition of done.
 
 ## M0 — Project Foundation
 
@@ -381,8 +381,10 @@ adapters remain blocked on clock mapping and reset policy evidence.
 [M3.3-C validation](../guides/m3-clock-epoch.md) adds tested epoch/generation
 invalidation and rejects unproven per-message correlation.
 [M3.3-D](../guides/m3-source-wire.md) measured source-to-wire VehicleOdometry
-offsets through unique captured payloads. Absolute uncertainty and estimator
-timing tolerance still block M3.4. The Ubuntu
+offsets through unique captured payloads. M3.3-E completed timing analysis,
+sensitivity experiments, uncertainty analysis and the release-gate decision.
+Prototype allocations exist; physical acquisition and mapping uncertainty still
+block production M3.4 readiness. The Ubuntu
 24.04 amd64 reference remains unverified.
 
 **Objective:** Connect standalone algorithms to a validated robotics simulation stack.
@@ -392,6 +394,25 @@ timing tolerance still block M3.4. The Ubuntu
 **Deliverables:** Validated setup guide, integration packages, single-drone end-to-end scenario.
 
 **Definition of done:** A documented scenario runs end to end; integration tests check data contracts and distinguish custom estimation from PX4 internal estimation.
+
+### M3.3-E — Estimator timing and architecture release gate
+
+- [x] **E.1:** [Timing requirements analysis](../architecture/estimator-timing-requirements.md).
+- [x] **E.2:** [Deterministic sensitivity experiments](../reports/m3-estimator-timing-sensitivity.md): 5,880 runs, 20 seeds and complete repeated-sweep equality. Production estimator mathematics unchanged.
+- [x] **E.3:** [Clock uncertainty analysis](../architecture/runtime-clock-uncertainty.md), completed with unresolved physical acquisition and message-specific mapping uncertainty.
+- [x] **E.4:** [Review and release-gate decision](../reports/m3-timing-release-gate.md), including [ADR 0011](../adr/0011-source-time-qualification-and-release-gate.md).
+- [ ] **M3.4 production readiness:** BLOCKED on topic-specific acquisition semantics, a defensible ≤0.5 ms registration / ≤1 ms pairwise bound over approved coverage, epoch/generation invalidation and stale-packet rejection.
+
+The timing/motion values are approved for continued prototype experimentation
+only. Successful unit tests and timing sensitivity do not establish production
+mapping readiness. New live robotics experiments were excluded from E.4.
+
+**Next proposed package:** M3.3-F.1, source-time GPS qualification through the
+existing runtime no-adjustment mode (Option A). Explicitly approve configuration,
+coverage and any missing observation hook before execution. No new source/Gazebo
+bridge, firmware instrumentation or M3.4 adapter is authorized. Options B/C have
+bounded alternatives and stop conditions in the ADR. Detailed M3.5–M3.8 scopes
+remain to be approved; they are not newly implemented by this package.
 
 ## M4 — Uncertainty-Aware Autonomous Navigation
 

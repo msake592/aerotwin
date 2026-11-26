@@ -1,5 +1,10 @@
 # M3.3-C clock correlation and epoch enforcement
 
+This guide preserves the M3.3-C checkpoint and its measured scope. The
+subsequent [M3.3-E release gate](../reports/m3-timing-release-gate.md) records
+prototype timing allocations and the current architecture decision. Production
+timestamp mapping remains BLOCKED.
+
 M3.4 remains **BLOCKED**. The validation infrastructure rejects unproven
 mappings and preserves temporal boundaries. Exact source-to-wire message
 identity remains unavailable in the exercised interfaces.
