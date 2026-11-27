@@ -1,0 +1,456 @@
+diff --git a/src/modules/simulation/gz_bridge/CMakeLists.txt b/src/modules/simulation/gz_bridge/CMakeLists.txt
+index aa4b1be..f63d184 100644
+--- a/src/modules/simulation/gz_bridge/CMakeLists.txt
++++ b/src/modules/simulation/gz_bridge/CMakeLists.txt
+@@ -70,6 +70,12 @@ if (gz-transport_FOUND)
+ 			module.yaml
+ 	)
+ 
++    option(AEROTWIN_GPS_OBSERVER "Validation-only GPS acquisition observer" OFF)
++    if(AEROTWIN_GPS_OBSERVER)
++        target_sources(modules__simulation__gz_bridge PRIVATE GpsAcquisitionObserver.cpp)
++        target_compile_definitions(modules__simulation__gz_bridge PRIVATE AEROTWIN_GPS_OBSERVER=1)
++    endif()
++
+     target_include_directories(modules__simulation__gz_bridge
+         PUBLIC
+             ${PX4_GZ_MSGS_BINARY_DIR}
+diff --git a/src/modules/simulation/gz_bridge/GZBridge.cpp b/src/modules/simulation/gz_bridge/GZBridge.cpp
+index 3ef65e1..ed4cd62 100644
+--- a/src/modules/simulation/gz_bridge/GZBridge.cpp
++++ b/src/modules/simulation/gz_bridge/GZBridge.cpp
+@@ -57,6 +57,9 @@ GZBridge::~GZBridge()
+ 	for (auto &sub_topic : _node.SubscribedTopics()) {
+ 		_node.Unsubscribe(sub_topic);
+ 	}
++#ifdef AEROTWIN_GPS_OBSERVER
++	_gps_observer.stop(); // subscriptions quiesced before draining the observer
++#endif
+ }
+ 
+ int GZBridge::init()
+@@ -307,6 +310,12 @@ bool GZBridge::subscribeNavsat(bool required)
+ 	std::string nav_sat_topic = "/world/" + _world_name + "/model/" + _model_name +
+ 				    "/link/base_link/sensor/navsat_sensor/navsat";
+ 
++#ifdef AEROTWIN_GPS_OBSERVER
++	if (!_gps_observer.start(nav_sat_topic.c_str())) {
++		PX4_ERR("invalid GPS observer configuration");
++		return false;
++	}
++#endif
+ 	if (!_node.Subscribe(nav_sat_topic, &GZBridge::navSatCallback, this)) {
+ 		PX4_ERR("failed to subscribe to %s", nav_sat_topic.c_str());
+ 		return required ? false : true;
+@@ -713,11 +722,17 @@ void GZBridge::addGpsNoise(double &latitude, double &longitude, double &altitude
+ void GZBridge::navSatCallback(const gz::msgs::NavSat &msg)
+ {
+ 	const uint64_t timestamp = hrt_absolute_time();
++#ifdef AEROTWIN_GPS_OBSERVER
++	const auto observation = _gps_observer.begin();
++#endif
+ 
+ 	// initialize gps position
+ 	if (!_pos_ref.isInitialized()) {
+ 		_pos_ref.initReference(msg.latitude_deg(), msg.longitude_deg(), timestamp);
+ 		_alt_ref = msg.altitude();
++#ifdef AEROTWIN_GPS_OBSERVER
++		_gps_observer.finish(observation, msg, timestamp, nullptr, false, -1);
++#endif
+ 		return;
+ 	}
+ 
+@@ -796,7 +811,13 @@ void GZBridge::navSatCallback(const gz::msgs::NavSat &msg)
+ 	sensor_gps.vel_ned_valid = true;
+ 	sensor_gps.satellites_used = _sim_gps_used.get();
+ 
++#ifdef AEROTWIN_GPS_OBSERVER
++	const bool published = _sensor_gps_pub.publish(sensor_gps);
++	_gps_observer.finish(observation, msg, timestamp, &sensor_gps, published,
++			     published ? _sensor_gps_pub.get_instance() : -1);
++#else
+ 	_sensor_gps_pub.publish(sensor_gps);
++#endif
+ }
+ 
+ void GZBridge::laserScantoLidarSensorCallback(const gz::msgs::LaserScan &msg)
+diff --git a/src/modules/simulation/gz_bridge/GZBridge.hpp b/src/modules/simulation/gz_bridge/GZBridge.hpp
+index 9f90f4d..aae6810 100644
+--- a/src/modules/simulation/gz_bridge/GZBridge.hpp
++++ b/src/modules/simulation/gz_bridge/GZBridge.hpp
+@@ -82,6 +82,10 @@
+ // Custom PX4 proto
+ #include <opticalflow.pb.h>
+ 
++#ifdef AEROTWIN_GPS_OBSERVER
++#include "GpsAcquisitionObserver.hpp"
++#endif
++
+ using namespace time_literals;
+ 
+ class GZBridge : public ModuleBase<GZBridge>, public ModuleParams, public px4::ScheduledWorkItem
+@@ -105,6 +109,9 @@ public:
+ 	int print_status() override;
+ 
+ private:
++#ifdef AEROTWIN_GPS_OBSERVER
++	aerotwin_gps::Observer _gps_observer;
++#endif
+ 
+ 	void Run() override;
+ 
+diff --git a/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.cpp b/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.cpp
+new file mode 100644
+index 0000000..1155904
+--- /dev/null
++++ b/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.cpp
+@@ -0,0 +1,296 @@
++#include "GpsAcquisitionObserver.hpp"
++#include <algorithm>
++#include <cerrno>
++#include <chrono>
++#include <climits>
++#include <cstdlib>
++#include <cstring>
++#include <fcntl.h>
++#include <limits>
++#include <signal.h>
++#include <sys/stat.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++
++namespace aerotwin_gps {
++static_assert(std::atomic<uint64_t>::is_always_lock_free, "Observer requires lock-free uint64");
++static_assert(sizeof(float) == 4 && sizeof(double) == 8, "Native payload sizes");
++namespace {
++void put(uint8_t *dst, uint64_t value, unsigned bytes)
++{ for (unsigned i = 0; i < bytes; ++i) { dst[i] = uint8_t(value >> (8 * i)); } }
++uint64_t get(const uint8_t *src, unsigned bytes)
++{ uint64_t v = 0; for (unsigned i = 0; i < bytes; ++i) { v |= uint64_t(src[i]) << (8 * i); } return v; }
++uint64_t hostNow()
++{
++ struct timespec ts{};
++ if (syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &ts) != 0) { return 0; }
++ return uint64_t(ts.tv_sec) * 1000000000ULL + uint64_t(ts.tv_nsec);
++}
++void sleepBriefly() { std::this_thread::sleep_for(std::chrono::milliseconds(1)); }
++uint32_t crc(uint32_t state, const uint8_t *data, size_t n)
++{
++ for (size_t i = 0; i < n; ++i) {
++  state ^= data[i];
++  for (unsigned j = 0; j < 8; ++j) { state = (state >> 1) ^ (0xedb88320U & (0U - (state & 1U))); }
++ }
++ return state;
++}
++// SHA-256 for the fixed 480-byte context only; no callback hashing/dependency.
++std::array<uint8_t, 32> contextDigest(const uint8_t *data)
++{
++ static constexpr uint32_t k[64] = {
++  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2};
++ uint32_t h[8] = {0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19};
++ std::array<uint8_t, 512> input{};
++ memcpy(input.data(), data, 480); input[480] = 0x80; input[510] = 0x0f;
++ const auto rotate = [](uint32_t x, unsigned n) { return (x >> n) | (x << (32 - n)); };
++ for (unsigned block = 0; block < 8; ++block) {
++  uint32_t w[64]{};
++  for (unsigned i = 0; i < 16; ++i) {
++   const auto p = input.data() + block * 64 + i * 4;
++   w[i] = (uint32_t(p[0]) << 24) | (uint32_t(p[1]) << 16) | (uint32_t(p[2]) << 8) | uint32_t(p[3]);
++  }
++  for (unsigned i = 16; i < 64; ++i) {
++   const uint32_t s0 = rotate(w[i-15],7) ^ rotate(w[i-15],18) ^ (w[i-15] >> 3);
++   const uint32_t s1 = rotate(w[i-2],17) ^ rotate(w[i-2],19) ^ (w[i-2] >> 10);
++   w[i] = w[i-16] + s0 + w[i-7] + s1;
++  }
++  uint32_t a=h[0], b=h[1], c=h[2], d=h[3], e=h[4], f=h[5], g=h[6], v=h[7];
++  for (unsigned i = 0; i < 64; ++i) {
++   const uint32_t s1 = rotate(e,6) ^ rotate(e,11) ^ rotate(e,25);
++   const uint32_t t1 = v + s1 + ((e & f) ^ (~e & g)) + k[i] + w[i];
++   const uint32_t s0 = rotate(a,2) ^ rotate(a,13) ^ rotate(a,22);
++   const uint32_t t2 = s0 + ((a & b) ^ (a & c) ^ (b & c));
++   v=g; g=f; f=e; e=d+t1; d=c; c=b; b=a; a=t1+t2;
++  }
++  h[0]+=a; h[1]+=b; h[2]+=c; h[3]+=d; h[4]+=e; h[5]+=f; h[6]+=g; h[7]+=v;
++ }
++ std::array<uint8_t,32> result{};
++ for (unsigned i=0; i<8; ++i) { for (unsigned j=0; j<4; ++j) { result[i*4+j]=uint8_t(h[i] >> (24-j*8)); } }
++ return result;
++}
++bool nonzero(const uint8_t *p, size_t n)
++{ uint8_t v = 0; for (size_t i = 0; i < n; ++i) { v |= p[i]; } return v != 0; }
++bool textField(const uint8_t *p, size_t n)
++{
++ const auto end = static_cast<const uint8_t *>(memchr(p, 0, n));
++ if (!end || end == p) { return false; }
++ for (auto c = p; c < end; ++c) { if (*c < 32 || *c > 126) { return false; } }
++ for (auto c = end; c < p + n; ++c) { if (*c != 0) { return false; } }
++ return true;
++}
++template<typename T> void bits(uint8_t *p, const T &value)
++{
++ static_assert(sizeof(T) == 4 || sizeof(T) == 8, "Payload field size");
++ // memcpy preserves object representation despite PX4 -fno-signed-zeros.
++ if constexpr (sizeof(T) == 4) { uint32_t v; memcpy(&v, &value, 4); put(p, v, 4); }
++ else { uint64_t v; memcpy(&v, &value, 8); put(p, v, 8); }
++}
++}
++Queue::Queue()
++{ for (uint64_t i = 0; i < Capacity; ++i) { _slots[i].turn.store(i); } }
++bool Queue::push(Record record)
++{
++ uint64_t head = _head.load(std::memory_order_relaxed);
++ if (head > UINT64_MAX - Capacity) { return false; } // Never wrap slot sequences.
++ Slot &slot = _slots[head % Capacity];
++ if (slot.turn.load(std::memory_order_acquire) != head ||
++     !_head.compare_exchange_strong(head, head + 1, std::memory_order_relaxed)) { return false; }
++ put(record.data() + 48, head, 8);
++ slot.record = record;
++ slot.turn.store(head + 1, std::memory_order_release);
++ return true;
++}
++bool Queue::pop(Record &record)
++{
++ const uint64_t tail = _tail.load(std::memory_order_relaxed);
++ Slot &slot = _slots[tail % Capacity];
++ if (slot.turn.load(std::memory_order_acquire) != tail + 1) { return false; }
++ record = slot.record;
++ slot.turn.store(tail + Capacity, std::memory_order_release);
++ _tail.store(tail + 1, std::memory_order_release);
++ return true;
++}
++struct Observer::State {
++ std::array<uint8_t, 512> header{};
++ Queue queue;
++ std::atomic<uint64_t> callbacks{0}, enqueued{0}, drained{0}, overflow{0}, invalid{0}, errors{0}, high{0};
++ std::atomic<uint64_t> queue_max{0}, callback_max{0};
++ std::atomic<bool> stopping{false}, ready{false}, header_ok{false};
++ bool timing{false};
++ int fd{-1};
++ std::thread thread;
++};
++Observer::Observer() = default;
++Observer::~Observer() { stop(); }
++bool Observer::start(const char *topic)
++{
++ if (_state) { return false; }
++ const char *enable = getenv("AEROTWIN_GPS_OBSERVER");
++ if (!enable || strcmp(enable, "0") == 0) { return true; }
++ if (strcmp(enable, "1") != 0 || !topic) { return false; }
++ const char *context = getenv("AEROTWIN_GPS_CONTEXT");
++ const char *output = getenv("AEROTWIN_GPS_FIFO");
++ const char *timing = getenv("AEROTWIN_GPS_TIMING");
++ if (!context || context[0] != '/' || !output || output[0] != '/' ||
++     (timing && strcmp(timing, "0") != 0 && strcmp(timing, "1") != 0)) { return false; }
++ auto state = std::make_unique<State>();
++ const int config = open(context, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
++ if (config < 0) { return false; }
++ struct stat st{};
++ bool ok = fstat(config, &st) == 0 && S_ISREG(st.st_mode) && st.st_size == 512 &&
++           read(config, state->header.data(), 512) == 512;
++ close(config);
++ const auto h = state->header.data();
++ ok = ok && memcmp(h, "ATGPSH1\0", 8) == 0 && nonzero(h + 8, 16) && nonzero(h + 24, 16) &&
++      get(h + 40, 8) > 0 && textField(h + 48, 128) && textField(h + 176, 64);
++ if (!ok || strlen(topic) >= 128 || strcmp(topic, reinterpret_cast<const char *>(h + 48)) != 0) { return false; }
++ for (unsigned offset : {240U, 260U, 292U, 324U, 356U, 388U, 480U}) {
++  if (!nonzero(h + offset, offset == 240 ? 20 : 32)) { return false; }
++ }
++ if (nonzero(h + 420, 60) || memcmp(contextDigest(h).data(), h + 480, 32) != 0) { return false; }
++ state->fd = open(output, O_WRONLY | O_NONBLOCK | O_CLOEXEC | O_NOFOLLOW);
++ if (state->fd < 0) { return false; }
++ if (fstat(state->fd, &st) != 0 || !S_ISFIFO(st.st_mode)) { close(state->fd); return false; }
++ state->timing = timing && strcmp(timing, "1") == 0;
++ _state = std::move(state);
++ try { _state->thread = std::thread(&Observer::writer, this); }
++ catch (...) { close(_state->fd); _state.reset(); return false; }
++ // Writer signals ready only after header commit (and blocks SIGPIPE in its own thread).
++ const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
++ while (!_state->ready.load() && std::chrono::steady_clock::now() < deadline) { sleepBriefly(); }
++ if (!_state->ready.load() || !_state->header_ok.load()) { stop(); return false; }
++ _enabled.store(true);
++ return true;
++}
++Observer::Ticket Observer::begin()
++{
++ if (!_enabled.load(std::memory_order_acquire)) { return {}; }
++ const auto id = _state->callbacks.fetch_add(1);
++ if (id == UINT64_MAX) { _state->errors.fetch_add(1); _enabled.store(false); return {}; }
++ return {id, _state->timing ? hostNow() : 0, true};
++}
++void Observer::finish(const Ticket &ticket, const gz::msgs::NavSat &msg, uint64_t assigned,
++                      const sensor_gps_s *gps, bool published, int instance)
++{
++ if (!ticket.active) { return; }
++ Record r{};
++ memcpy(r.data(), "EVT1", 4);
++ memcpy(r.data() + 8, _state->header.data() + 480, 32);
++ put(r.data() + 40, ticket.ordinal, 8);
++ put(r.data() + 72, assigned, 8);
++ bool valid = msg.has_header() && msg.header().has_stamp() && msg.header().data_size() <= 16 &&
++              msg.frame_id().size() < 64 && msg.frame_id() == reinterpret_cast<const char *>(_state->header.data() + 176);
++ uint64_t seq = 0;
++ unsigned sequences = 0;
++ if (valid) {
++  const auto &stamp = msg.header().stamp();
++  valid = stamp.sec() >= 0 && stamp.nsec() >= 0 && stamp.nsec() < 1000000000 &&
++          uint64_t(stamp.sec()) <= (uint64_t(INT64_MAX) - uint64_t(stamp.nsec())) / 1000000000ULL;
++  if (valid) { put(r.data() + 64, uint64_t(stamp.sec()) * 1000000000ULL + uint64_t(stamp.nsec()), 8); }
++  for (const auto &entry : msg.header().data()) {
++   if (entry.key() != "seq") { continue; }
++   ++sequences;
++   if (entry.value_size() != 1 || entry.value(0).empty() || entry.value(0).size() > 20) { valid = false; continue; }
++   for (const unsigned char c : entry.value(0)) {
++    if (c < '0' || c > '9' || seq > (UINT64_MAX - uint64_t(c - '0')) / 10) { valid = false; break; }
++    seq = seq * 10 + uint64_t(c - '0');
++   }
++  }
++ }
++ valid = valid && sequences == 1;
++ put(r.data() + 56, seq, 8);
++ r[154] = gps ? 2 : 1; // Published / initialization without publication.
++ if (gps) {
++  put(r.data() + 80, gps->timestamp, 8); put(r.data() + 88, gps->timestamp_sample, 8);
++  put(r.data() + 96, gps->device_id, 4); put(r.data() + 100, uint32_t(instance), 4);
++  bits(r.data() + 104, gps->latitude_deg); bits(r.data() + 112, gps->longitude_deg);
++  bits(r.data() + 120, gps->altitude_msl_m); bits(r.data() + 128, gps->altitude_ellipsoid_m);
++  bits(r.data() + 136, gps->vel_n_m_s); bits(r.data() + 140, gps->vel_e_m_s); bits(r.data() + 144, gps->vel_d_m_s);
++  put(r.data() + 148, gps->device_id, 4); r[152] = gps->fix_type; r[153] = gps->satellites_used;
++  r[155] = published ? 1 : 0; r[156] = gps->vel_ned_valid ? 1 : 0;
++ }
++ if (!valid) { r[154] = 3; _state->invalid.fetch_add(1); }
++ put(r.data() + 160, ticket.host_ns, 8);
++ if (_state->timing) { put(r.data() + 168, hostNow(), 8); put(r.data() + 176, hostNow(), 8); }
++ const uint64_t before = _state->timing ? hostNow() : 0;
++ const bool queued = _state->queue.push(r);
++ if (_state->timing) {
++  const uint64_t after = hostNow();
++  const auto maximum = [](std::atomic<uint64_t> &value, uint64_t sample) {
++   auto old = value.load();
++   if (sample > old && !value.compare_exchange_strong(old, sample)) { value.store(UINT64_MAX); }
++  };
++  maximum(_state->queue_max, after >= before && before ? after - before : UINT64_MAX);
++  maximum(_state->callback_max, after >= ticket.host_ns && ticket.host_ns ? after - ticket.host_ns : UINT64_MAX);
++ }
++ if (!queued) { _state->overflow.fetch_add(1); return; }
++ _state->enqueued.fetch_add(1);
++ const auto depth = std::min(_state->queue.size(), Queue::Capacity);
++ auto high = _state->high.load();
++ // One attempt only; conservative high-water upper bound corrected by writer too.
++ if (depth > high) { if (!_state->high.compare_exchange_strong(high, depth)) { _state->high.store(Queue::Capacity); } }
++}
++void Observer::writer()
++{
++ sigset_t blocked;
++ sigemptyset(&blocked); sigaddset(&blocked, SIGPIPE);
++ pthread_sigmask(SIG_BLOCK, &blocked, nullptr);
++ const auto writeOne = [this](const uint8_t *p, size_t n) {
++  const auto result = write(_state->fd, p, n);
++  if (result == static_cast<ssize_t>(n)) { return 1; }
++  if (result < 0 && (errno == EAGAIN || errno == EINTR)) { return 0; }
++  _state->errors.fetch_add(1); return -1;
++ };
++ const bool header = writeOne(_state->header.data(), 512) == 1;
++ _state->header_ok.store(header); _state->ready.store(true);
++ if (!header) { _state->errors.fetch_add(1); return; }
++ uint32_t checksum = 0xffffffffU;
++ Record pending{};
++ bool have = false;
++ auto deadline = std::chrono::steady_clock::time_point::max();
++ while (true) {
++  if (_state->stopping.load() && deadline == std::chrono::steady_clock::time_point::max()) {
++   deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
++  }
++  if (!have) { have = _state->queue.pop(pending); }
++  if (have) {
++   const auto result = writeOne(pending.data(), pending.size());
++   if (result < 0) { break; }
++   if (result == 1) {
++    checksum = crc(checksum, pending.data(), pending.size());
++    _state->drained.fetch_add(1); have = false; continue;
++   }
++  } else if (_state->stopping.load() && _state->queue.size() == 0) { break; }
++  if (std::chrono::steady_clock::now() >= deadline) { _state->errors.fetch_add(1); break; }
++  sleepBriefly();
++ }
++ std::array<uint8_t, 128> footer{};
++ memcpy(footer.data(), "ATGPSF1\0", 8); memcpy(footer.data() + 8, _state->header.data() + 480, 32);
++ const uint64_t values[] = {_state->callbacks.load(), _state->enqueued.load(), _state->drained.load(),
++  _state->overflow.load(), _state->invalid.load(), _state->errors.load(), _state->high.load(),
++  uint64_t(have || _state->queue.size() != 0)};
++ for (unsigned i = 0; i < 8; ++i) { put(footer.data() + 40 + i * 8, values[i], 8); }
++ put(footer.data() + 108, _state->queue_max.load(), 8);
++ put(footer.data() + 116, _state->callback_max.load(), 8);
++ put(footer.data() + 104, crc(checksum, footer.data(), footer.size()) ^ 0xffffffffU, 4);
++ // No retry forever at shutdown: missing footer always invalidates evidence.
++ writeOne(footer.data(), footer.size());
++}
++void Observer::stop()
++{
++ _enabled.store(false);
++ if (!_state) { return; }
++ _state->stopping.store(true);
++ if (_state->thread.joinable()) { _state->thread.join(); }
++ close(_state->fd);
++ _state.reset();
++}
++}
+diff --git a/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.hpp b/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.hpp
+new file mode 100644
+index 0000000..61fd928
+--- /dev/null
++++ b/src/modules/simulation/gz_bridge/GpsAcquisitionObserver.hpp
+@@ -0,0 +1,47 @@
++// Validation-only acquisition evidence; excluded unless AEROTWIN_GPS_OBSERVER is enabled.
++#pragma once
++#include <array>
++#include <atomic>
++#include <cstdint>
++#include <memory>
++#include <thread>
++#include <gz/msgs/navsat.pb.h>
++#include <uORB/topics/sensor_gps.h>
++
++namespace aerotwin_gps {
++using Record = std::array<uint8_t, 192>;
++// Bounded MPSC reservation: a single CAS attempt; contention/full are counted losses.
++// Consumer alone owns tail. Slot sequence protects publication/reuse.
++class Queue {
++public:
++ static constexpr uint64_t Capacity = 8192;
++ Queue();
++ bool push(Record record);
++ bool pop(Record &record);
++ uint64_t size() const { const auto tail = _tail.load(); return _head.load() - tail; }
++private:
++ struct Slot { std::atomic<uint64_t> turn{0}; Record record{}; };
++ std::array<Slot, Capacity> _slots{};
++ std::atomic<uint64_t> _head{0}, _tail{0};
++};
++class Observer {
++public:
++ struct Ticket { uint64_t ordinal{0}, host_ns{0}; bool active{false}; };
++ Observer();
++ ~Observer();
++ Observer(const Observer &) = delete;
++ Observer &operator=(const Observer &) = delete;
++ bool start(const char *topic);
++ Ticket begin();
++ void finish(const Ticket &ticket, const gz::msgs::NavSat &msg, uint64_t assigned,
++             const sensor_gps_s *gps, bool published, int instance);
++ // Caller must quiesce subscription callbacks before stop/destruction.
++ void stop();
++ bool enabled() const { return _enabled.load(); }
++private:
++ struct State;
++ std::unique_ptr<State> _state;
++ std::atomic<bool> _enabled{false};
++ void writer();
++};
++}

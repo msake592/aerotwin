@@ -1,0 +1,3 @@
+# Unified-diff context retains upstream whitespace; check applied contents with
+# git apply --check --whitespace=error-all instead of checking diff syntax as code.
+integrations/px4/patches/*.patch -whitespace

@@ -23,7 +23,9 @@ Dependencies are completion gates for the planned sequence, not evidence of impl
 | M3.3-E.4 | Review and architecture decision complete | [Release gate](../reports/m3-timing-release-gate.md), [ADR 0011](../adr/0011-source-time-qualification-and-release-gate.md) |
 | M3.4 production readiness | BLOCKED | Topic acquisition, numerical uncertainty, coverage, invalidation and stale-data evidence required |
 | M3.3-F.1 source-time GPS qualification | Protocol/offline package complete; GPS BLOCKED | [Report](../reports/m3-source-time-gps-qualification.md): no independent acquisition association, zero live attempts |
-| M3.3-F.2 acquisition observation-hook design | Proposed, not started | Requires explicit observation/instrumentation approval; no firmware changes authorized |
+| M3.3-F.2 acquisition observation-hook design | Design complete at F.2; followed by F.3 below | [Design](../architecture/gps-acquisition-observation-hook.md): single callback hook, event identity, overhead/loss accounting and isolated build plan; no firmware changes/builds/live attempts |
+| M3.3-F.3 isolated hook implementation/offline verification | Build/offline record complete; F.4 found lifecycle defect | [Report](../reports/m3-gps-hook-implementation.md): isolated incremental build, disabled review snapshot, 12 native scenarios and 196 Python tests; original reference unchanged; zero live attempts |
+| M3.3-F.4 GPS acquisition qualification | Final review/decision complete; GPS BLOCKED | [Final gate](../reports/m3-gps-acquisition-final-gate.md): mandatory review stop on R1 callback-lifetime defect; zero qualification/overhead sessions; no repair/build authorized |
 
 Engineering-package completion does not close the M3 integration milestone.
 The 0.5 ms per-stream / 1 ms pairwise values and motion/rate assumptions are
