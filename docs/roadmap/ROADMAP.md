@@ -416,12 +416,51 @@ launch, so zero of two allowed live attempts were used. No GPS timestamp or
 0.5 ms registration PASS is claimed. Epoch/stale-record checks pass only in
 deterministic scope. M3.4 remains BLOCKED.
 
-**Next proposed package:** M3.3-F.2, GPS acquisition observation-hook design and
-approval. Specify an atomic original Gazebo header / assigned HRT / post-noise
-GPS identity observation, then request explicit instrumentation approval. No
-firmware change, new source/Gazebo bridge or production adapter is authorized.
-Options B/C retain their ADR stop conditions. Detailed M3.5–M3.8 scopes remain
-to be approved; none is implemented by this package.
+### M3.3-F.2 — GPS acquisition observation-hook design
+
+**Package status:** [Design complete at the F.2 checkpoint; implementation follows in F.3](../architecture/gps-acquisition-observation-hook.md).
+The version-matched Gazebo NavSat header supplies simulation update time and a
+sensor-local sequence. One proposed validation-only GZBridge callback hook links
+that event to unchanged entry HRT and actual post-noise SensorGps identity.
+The design specifies loss/overhead accounting, exact event association,
+qualification criteria and an isolated incremental-build plan. No firmware patch,
+build or live session was performed in F.2; zero qualification attempts were consumed.
+Docker was unavailable at that design checkpoint; F.3 recovered and inspected it. GPS qualification
+and M3.4 remain **BLOCKED**.
+
+### M3.3-F.3 — Isolated GPS hook implementation and offline verification
+
+**Package status:** [Implementation/build/offline package complete for review](../reports/m3-gps-hook-implementation.md).
+The approved five-file validation-only PX4 patch preserves GPS values/noise,
+entry HRT and publication behavior. The isolated incremental ARM64 module build
+and executable relink passed; a separately identified review snapshot is saved
+with observation disabled by default. Original container/snapshot/binary remain
+unchanged. The bounded MPSC/FIFO mechanism passed 12 native offline scenarios;
+the full Python suite passed 196 tests and Debug/Release CTest each passed 230.
+Synthetic checks do not qualify acquisition registration. No live sessions or
+qualification attempts were consumed. GPS and M3.4 remain **BLOCKED**.
+
+**F.4 protocol:** [GPS acquisition qualification execution gate](../guides/m3-gps-hook-qualification.md).
+F.3's build/offline package passed its listed checks; the F.4 review below
+supersedes its earlier lifecycle acceptance assumption.
+
+### M3.3-F.4 — Final GPS acquisition qualification gate
+
+**Engineering package status:** [Review and release decision complete](../reports/m3-gps-acquisition-final-gate.md),
+GPS qualification and M3.4 **BLOCKED**. The mandatory pre-execution review found
+an unfenced callback lifetime during observer shutdown (R1/P1); Transport
+unsubscribe does not wait for copied/active receive handlers. No firmware was
+changed or rebuilt. Zero of two qualification attempts and zero of two approved
+overhead sessions were consumed. No live registration or preservation PASS/FAIL
+is claimed. Final local checks passed 196 Python tests, 230 Debug and 230 Release
+CTest cases, and 12 precompiled native scenarios; those tests do not exercise R1.
+
+The consolidated F.2–F.4 package is published for review with this unresolved
+finding. Recommended user decision: approve a narrowly scoped callback-lifetime
+repair and offline re-review before any live execution. Direct noisy Gazebo
+integration remains the broader ADR alternative; no alternative or numbered
+follow-up package starts automatically. No production GPS adapter is authorized.
+Detailed M3.5–M3.8 scopes remain to be approved.
 
 ## M4 — Uncertainty-Aware Autonomous Navigation
 
